@@ -399,17 +399,23 @@ function refreshVoteCounts() {
 
 async function doVote(pid) {
   const key = 'voted_' + pid;
-  if (localStorage.getItem(key)) { showToast('이미 투표했습니다 👍'); return; }
+  const already = !!localStorage.getItem(key);
+  const delta = already ? -1 : 1;
   try {
     await db.collection('votes').doc(pid).set(
-      { count: firebase.firestore.FieldValue.increment(1) },
+      { count: firebase.firestore.FieldValue.increment(delta) },
       { merge: true }
     );
-    localStorage.setItem(key, '1');
-    // update UI
     const btn = document.getElementById('voteBtn');
-    if (btn) { btn.classList.add('voted'); btn.disabled = true; btn.querySelector('.vote-text').textContent = '투표 완료 ✓'; }
-    showToast('투표했습니다! 👍');
+    if (already) {
+      localStorage.removeItem(key);
+      if (btn) { btn.classList.remove('voted'); btn.querySelector('.vote-text').textContent = '가고 싶어요'; }
+      showToast('투표를 취소했습니다.');
+    } else {
+      localStorage.setItem(key, '1');
+      if (btn) { btn.classList.add('voted'); btn.querySelector('.vote-text').textContent = '투표 취소'; }
+      showToast('투표했습니다! 👍');
+    }
   } catch(e) { showToast('오류가 발생했습니다. 다시 시도해 주세요.'); console.error(e); }
 }
 
@@ -444,22 +450,23 @@ function renderSuggestions(items) {
       ${s.note ? `<div class="sugg-note">${escHtml(s.note)}</div>` : ''}
       <div class="sugg-footer">
         <span class="sugg-time">${ago}</span>
-        <button class="sugg-vote-btn${voted?' voted':''}" data-sid="${s.id}" ${voted?'disabled':''}>
-          👍 ${s.votes || 0}
+        <button class="sugg-vote-btn${voted?' voted':''}" data-sid="${s.id}">
+          👍 ${s.votes || 0}${voted?' · 취소':''}
         </button>
       </div>
     </div>`;
   }).join('');
   // attach vote handlers
-  wrap.querySelectorAll('.sugg-vote-btn:not([disabled])').forEach(btn => {
+  wrap.querySelectorAll('.sugg-vote-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const sid = btn.dataset.sid;
       const key = 'svoted_' + sid;
-      if (localStorage.getItem(key)) return;
+      const already = !!localStorage.getItem(key);
+      const delta = already ? -1 : 1;
       try {
-        await db.collection('suggestions').doc(sid).update({ votes: firebase.firestore.FieldValue.increment(1) });
-        localStorage.setItem(key, '1');
-        showToast('제안에 투표했습니다 👍');
+        await db.collection('suggestions').doc(sid).update({ votes: firebase.firestore.FieldValue.increment(delta) });
+        if (already) { localStorage.removeItem(key); showToast('제안 투표를 취소했습니다.'); }
+        else { localStorage.setItem(key, '1'); showToast('제안에 투표했습니다 👍'); }
       } catch(e) { showToast('오류 발생. 다시 시도해 주세요.'); }
     });
   });
@@ -604,16 +611,14 @@ function renderDetail(p, isFood) {
     </div>
     <div class="d-section-lbl" style="margin-bottom:10px">이 장소 어때요?</div>
     <div class="vote-section">
-      <button class="vote-btn${voted?' voted':''}" id="voteBtn" ${voted?'disabled':''}>
+      <button class="vote-btn${voted?' voted':''}" id="voteBtn">
         <span class="vote-num" id="voteNum">${vc}</span>
-        👍 <span class="vote-text">${voted?'투표 완료 ✓':'가고 싶어요'}</span>
+        👍 <span class="vote-text">${voted?'투표 취소':'가고 싶어요'}</span>
       </button>
-      <div class="vote-label"><b>${voted?'투표해 주셨습니다!':'이 장소에 투표하세요'}</b>모든 사람의 투표가 실시간 반영됩니다.</div>
+      <div class="vote-label"><b>${voted?'투표했습니다. 다시 누르면 취소됩니다.':'이 장소에 투표하세요'}</b>모든 사람의 투표가 실시간 반영됩니다.</div>
     </div>`;
 
-  if (!voted) {
-    document.getElementById('voteBtn').addEventListener('click', () => doVote(pid));
-  }
+  document.getElementById('voteBtn').addEventListener('click', () => doVote(pid));
 }
 
 /* ── MODAL / PANEL EVENTS ── */

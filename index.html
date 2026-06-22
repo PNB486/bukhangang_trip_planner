@@ -3,82 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>[시안] 당일치기 빠지 플래너 · 7/16</title>
+<title>당일치기 빠지 플래너 · 7/16</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
-    --bg:#080c10;
-    --panel:#0e1520;
-    --panel2:#121c2a;
-    --ink:#e4ddd0;
-    --ink-soft:#7a8c9c;
-    --ink-dim:#2e3e4e;
-    --line:#1a2a3a;
-    --line2:#243244;
-    --gold:#c8a44a;
-    --gold-light:#e2be72;
-    --gold-dim:#5a4418;
-    --gold-glow:rgba(200,164,74,.12);
-    --coral:#c05838;
-    --moss:#4e9060;
-    --teal:#1a9080;
-    --warn:#c07828;
+    --bg:#080c10;--panel:#0e1520;--panel2:#121c2a;
+    --ink:#e4ddd0;--ink-soft:#7a8c9c;--ink-dim:#2e3e4e;
+    --line:#1a2a3a;--line2:#243244;
+    --gold:#c8a44a;--gold-light:#e2be72;--gold-dim:#5a4418;--gold-glow:rgba(200,164,74,.12);
+    --teal:#1a9080;--teal-light:#50c8b8;--teal-glow:rgba(26,144,128,.12);
+    --coral:#c05838;--moss:#4e9060;--warn:#c07828;
     --shadow:0 8px 36px rgba(0,0,0,.65);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{
-    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-    background:var(--bg);color:var(--ink);line-height:1.6;
-    display:flex;flex-direction:column;overflow:hidden;
-  }
-  body::after{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity:.04;
-  }
+  body{font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;display:flex;flex-direction:column;overflow:hidden}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.04}
 
   /* ── TOPBAR ── */
-  .topbar{
-    background:rgba(8,12,16,.96);backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line);
-    padding:0 24px;display:flex;align-items:center;gap:20px;flex-shrink:0;z-index:100;
-  }
-  .brand{
-    font-family:Georgia,serif;font-weight:700;font-size:16px;
-    white-space:nowrap;padding:14px 0;color:var(--ink);letter-spacing:-.02em;
-    display:flex;align-items:baseline;gap:7px;
-  }
+  .topbar{background:rgba(8,12,16,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:0 20px;display:flex;align-items:center;gap:16px;flex-shrink:0;z-index:200}
+  .brand{font-family:Georgia,serif;font-weight:700;font-size:16px;white-space:nowrap;padding:14px 0;color:var(--ink);letter-spacing:-.02em;display:flex;align-items:baseline;gap:7px}
   .brand b{background:linear-gradient(105deg,var(--gold-light),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
   .brand-sub{font-size:11px;color:var(--ink-soft);font-weight:400;font-family:system-ui}
-
-  /* ── ITINERARY FLOW ── */
-  .flow{
-    display:flex;align-items:center;gap:0;padding:0 4px;
-    border-left:1px solid var(--line);margin-left:4px;padding-left:16px;
-  }
-  .flow-step{
-    display:flex;align-items:center;gap:7px;
-    padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;
-    cursor:pointer;transition:.14s;white-space:nowrap;
-  }
+  .flow{display:flex;align-items:center;gap:0;border-left:1px solid var(--line);margin-left:4px;padding-left:14px}
+  .flow-step{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:.14s;white-space:nowrap}
   .flow-step:hover{background:rgba(255,255,255,.04)}
-  .flow-step .fs-icon{font-size:14px}
   .flow-step .fs-label{color:var(--ink-soft)}
   .flow-step.active .fs-label{color:var(--ink)}
   .flow-step .fs-time{font-size:10px;color:var(--ink-dim);display:block;margin-top:1px}
+  .flow-step[data-tab="badge"].active{position:relative}
+  .flow-step[data-tab="badge"].active::after{content:'';position:absolute;bottom:-1px;left:12px;right:12px;height:2px;border-radius:1px;background:var(--gold)}
+  .flow-step[data-tab="food"].active::after{content:'';position:absolute;bottom:-1px;left:12px;right:12px;height:2px;border-radius:1px;background:var(--teal)}
   .flow-arrow{color:var(--ink-dim);font-size:13px;padding:0 2px;flex-shrink:0}
-
-  /* underline for active flow step */
-  .tabs-underline{display:flex;height:2px;margin-top:0}
-  .flow-step.active{position:relative}
-  .flow-step.active::after{
-    content:'';position:absolute;bottom:-1px;left:12px;right:12px;
-    height:2px;border-radius:1px;
-  }
-  .flow-step[data-tab="badge"].active::after{background:var(--gold)}
-  .flow-step[data-tab="food"].active::after{background:var(--teal)}
-
-  .topbar-right{margin-left:auto;font-size:11px;color:var(--ink-dim);white-space:nowrap}
+  .topbar-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .tb-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);background:transparent;color:var(--ink-soft);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:.14s;white-space:nowrap}
+  .tb-btn:hover{border-color:var(--gold-dim);color:var(--gold-light)}
+  .tb-btn.teal:hover{border-color:var(--teal);color:var(--teal-light)}
+  .tb-btn .sugg-cnt{font-size:10px;background:var(--teal);color:#fff;border-radius:999px;padding:0 6px;margin-left:2px;display:none}
+  .tb-btn .sugg-cnt.show{display:inline}
 
   /* ── LAYOUT ── */
   .layout{display:grid;grid-template-columns:272px 1fr;flex:1;min-height:0}
@@ -91,44 +54,29 @@
   .list-scroll{overflow-y:auto;flex:1}
   .list-scroll::-webkit-scrollbar{width:3px}
   .list-scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
-
-  .list-group-label{
-    padding:11px 18px 5px;font-size:9.5px;font-weight:700;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--ink-dim);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:7px;
-  }
+  .list-group-label{padding:11px 18px 5px;font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px}
   .list-group-label i{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
-
-  .list-item{
-    display:flex;align-items:center;gap:11px;padding:11px 18px;cursor:pointer;
-    border-left:2px solid transparent;transition:background .12s,border-color .12s;
-  }
+  .list-item{display:flex;align-items:center;gap:11px;padding:10px 18px;cursor:pointer;border-left:2px solid transparent;transition:background .12s,border-color .12s}
   .list-item:hover{background:rgba(255,255,255,.028)}
   .list-item.active{background:rgba(200,164,74,.055);border-left-color:var(--gold)}
   .list-item.active.food-item{background:rgba(26,144,128,.055);border-left-color:var(--teal)}
-  .item-num{
-    width:22px;height:22px;border-radius:6px;flex-shrink:0;
-    background:var(--panel2);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    font-size:10px;font-weight:800;color:var(--ink-dim);transition:.12s;
-  }
+  .item-num{width:22px;height:22px;border-radius:6px;flex-shrink:0;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--ink-dim);transition:.12s}
   .list-item.active .item-num{background:var(--gold);border-color:var(--gold);color:#060a0e}
   .list-item.active.food-item .item-num{background:var(--teal);border-color:var(--teal);color:#fff}
   .item-body{min-width:0;flex:1}
   .item-name{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
   .item-tag-sm{font-size:9px;font-weight:700;letter-spacing:.05em;padding:0 5px;border-radius:3px;flex-shrink:0;border:1px solid}
-  .item-tag-sm.badge{color:var(--gold-light);border-color:rgba(200,164,74,.3);background:rgba(200,164,74,.08)}
   .item-tag-sm.combo{color:var(--gold-light);border-color:rgba(200,164,74,.3);background:rgba(200,164,74,.08)}
-  .item-tag-sm.food{color:#50c8b8;border-color:rgba(26,144,128,.3);background:rgba(26,144,128,.08)}
+  .item-tag-sm.food{color:var(--teal-light);border-color:rgba(26,144,128,.3);background:rgba(26,144,128,.08)}
   .item-sub{font-size:11px;color:var(--ink-dim);margin-top:1px}
-  .item-star{font-size:11.5px;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
-  .item-star.teal{color:#50c8b8}
+  .item-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+  .item-star{font-size:11.5px;font-weight:700;color:var(--gold);white-space:nowrap}
+  .item-star.teal{color:var(--teal-light)}
+  .item-votes{font-size:10px;color:var(--ink-dim);white-space:nowrap}
+  .item-votes.has-votes{color:var(--gold-light)}
 
   /* ── RIGHT ── */
-  .detail-panel{
-    overflow-y:auto;
-    background:radial-gradient(ellipse 130% 50% at 80% -8%,#0d1e30 0%,transparent 55%),var(--bg);
-  }
+  .detail-panel{overflow-y:auto;background:radial-gradient(ellipse 130% 50% at 80% -8%,#0d1e30 0%,transparent 55%),var(--bg)}
   .detail-panel::-webkit-scrollbar{width:4px}
   .detail-panel::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
   .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--ink-dim);text-align:center;gap:10px;padding:48px}
@@ -136,53 +84,146 @@
   .detail-empty p{font-size:13.5px;line-height:1.8;color:var(--ink-soft)}
   .detail-content{padding:30px 38px 60px;max-width:700px}
 
-  /* detail header */
   .d-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:6px}
   .d-name{font-family:Georgia,serif;font-size:clamp(20px,2.8vw,28px);font-weight:700;letter-spacing:-.025em;line-height:1.2}
   .d-ctag{font-size:10px;font-weight:700;padding:4px 11px;border-radius:7px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;margin-top:4px}
   .d-ctag.badge{background:rgba(200,164,74,.11);color:var(--gold-light);border:1px solid rgba(200,164,74,.24)}
-  .d-ctag.food{background:rgba(26,144,128,.11);color:#50c8b8;border:1px solid rgba(26,144,128,.24)}
-
+  .d-ctag.food{background:rgba(26,144,128,.11);color:var(--teal-light);border:1px solid rgba(26,144,128,.24)}
   .d-meta{display:flex;flex-wrap:wrap;gap:7px 16px;margin:11px 0 18px;font-size:13px;color:var(--ink-soft);align-items:center}
   .d-stars{color:var(--gold);font-weight:700}
-  .d-stars.teal{color:#50c8b8}
+  .d-stars.teal{color:var(--teal-light)}
   .d-region{font-size:11.5px;background:rgba(255,255,255,.03);border:1px solid var(--line);padding:2px 9px;border-radius:4px}
-  .d-from{font-size:11.5px;color:var(--ink-dim)}
-
-  /* info grid */
   .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
   .info-card{background:rgba(255,255,255,.022);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
   .info-card .ic-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px}
   .info-card .ic-val{font-size:13px;color:var(--ink);font-weight:600;line-height:1.5}
   .info-card .ic-val.hl{color:var(--gold-light);font-weight:700}
-  .info-card .ic-val.hl-teal{color:#50c8b8;font-weight:700}
-
-  /* note */
+  .info-card .ic-val.hl-teal{color:var(--teal-light);font-weight:700}
   .d-section{margin-bottom:20px}
   .d-section-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:7px}
   .d-note{font-size:13.5px;color:var(--ink-soft);line-height:1.75;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-
   .facilities{display:flex;flex-wrap:wrap;gap:6px}
   .fac{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--ink-soft)}
-
   .d-flags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
   .flag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
   .flag.combo{background:rgba(200,164,74,.1);border:1px solid rgba(200,164,74,.22);color:var(--gold-light)}
   .flag.lowrel{background:rgba(192,120,40,.1);border:1px solid rgba(192,120,40,.22);color:var(--warn)}
-  .flag.rec{background:rgba(26,144,128,.1);border:1px solid rgba(26,144,128,.22);color:#50c8b8}
-
-  /* map */
+  .flag.rec{background:rgba(26,144,128,.1);border:1px solid rgba(26,144,128,.22);color:var(--teal-light)}
   .map-wrap{border-radius:13px;overflow:hidden;border:1px solid var(--line);margin-bottom:20px;position:relative;background:var(--panel2)}
   .map-wrap iframe{display:block;width:100%;height:200px;border:none;opacity:.88;filter:invert(90%) hue-rotate(185deg) saturate(1.15) brightness(.85)}
   .map-overlay{position:absolute;bottom:9px;right:9px;background:rgba(8,12,16,.85);border:1px solid var(--line2);border-radius:7px;padding:4px 10px;font-size:11px;color:var(--ink-soft);backdrop-filter:blur(8px)}
   .map-overlay a{color:var(--gold-light);text-decoration:none;font-weight:600}
-  .map-overlay a:hover{color:var(--gold)}
-
-  /* links */
-  .d-links{display:flex;gap:9px;margin-bottom:0;flex-wrap:wrap}
+  .d-links{display:flex;gap:9px;margin-bottom:20px;flex-wrap:wrap}
   .d-link{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.03);border:1px solid var(--line2);border-radius:10px;padding:9px 15px;font-size:12.5px;font-weight:600;color:var(--ink-soft);text-decoration:none;transition:.14s}
   .d-link:hover{border-color:var(--gold-dim);color:var(--gold-light)}
-  .d-link.teal:hover{border-color:var(--teal);color:#50c8b8}
+
+  /* ── VOTE SECTION ── */
+  .vote-section{
+    display:flex;align-items:center;gap:14px;
+    background:rgba(255,255,255,.022);border:1px solid var(--line);
+    border-radius:14px;padding:16px 20px;margin-bottom:8px;
+  }
+  .vote-btn{
+    display:flex;align-items:center;gap:8px;
+    border:1.5px solid var(--gold-dim);background:rgba(200,164,74,.07);
+    color:var(--gold-light);border-radius:10px;padding:10px 18px;
+    font-size:14px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .vote-btn:hover{background:rgba(200,164,74,.15);border-color:var(--gold);box-shadow:0 0 18px rgba(200,164,74,.18)}
+  .vote-btn.voted{background:rgba(200,164,74,.22);border-color:var(--gold);color:var(--gold);cursor:default}
+  .vote-btn .vote-num{font-size:18px;font-weight:800;color:var(--gold-light);min-width:24px;text-align:center}
+  .vote-label{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .vote-label b{color:var(--ink);display:block;font-size:14px}
+
+  /* ── SUGGESTION MODAL ── */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(4,8,14,.85);backdrop-filter:blur(8px);
+    z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .modal-overlay.open{opacity:1;pointer-events:auto}
+  .modal{
+    background:linear-gradient(160deg,#111d2c,#0c1620);
+    border:1px solid var(--line2);border-radius:20px;
+    box-shadow:0 24px 64px rgba(0,0,0,.7);
+    padding:28px 28px 24px;width:100%;max-width:480px;
+    transform:translateY(16px);transition:transform .2s;
+  }
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .modal-head h3{font-family:Georgia,serif;font-size:20px;font-weight:700}
+  .modal-close{background:transparent;border:none;color:var(--ink-soft);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+  .modal-close:hover{color:var(--ink)}
+  .modal-hint{font-size:12.5px;color:var(--ink-soft);margin-bottom:20px;line-height:1.5}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px}
+  .form-group input,.form-group select,.form-group textarea{
+    width:100%;background:rgba(255,255,255,.035);border:1px solid var(--line2);
+    border-radius:10px;padding:10px 13px;font-size:13.5px;color:var(--ink);
+    font-family:inherit;outline:none;transition:border-color .14s;
+  }
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal)}
+  .form-group select{cursor:pointer}
+  .form-group select option{background:#0e1520}
+  .form-group textarea{resize:vertical;min-height:80px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;gap:10px;margin-top:18px}
+  .btn-submit{
+    flex:1;background:linear-gradient(120deg,rgba(26,144,128,.25),rgba(26,144,128,.12));
+    border:1.5px solid var(--teal);color:var(--teal-light);
+    border-radius:10px;padding:11px;font-size:14px;font-weight:700;
+    cursor:pointer;transition:.15s;
+  }
+  .btn-submit:hover{background:linear-gradient(120deg,rgba(26,144,128,.4),rgba(26,144,128,.2));box-shadow:0 4px 20px rgba(26,144,128,.2)}
+  .btn-submit:disabled{opacity:.5;cursor:not-allowed}
+  .btn-cancel{background:transparent;border:1px solid var(--line);color:var(--ink-soft);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:.14s}
+  .btn-cancel:hover{border-color:var(--coral);color:var(--coral)}
+
+  /* ── SUGGESTIONS PANEL ── */
+  .sugg-overlay{position:fixed;inset:0;background:rgba(4,8,14,.85);backdrop-filter:blur(8px);z-index:900;display:flex;align-items:stretch;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+  .sugg-overlay.open{opacity:1;pointer-events:auto}
+  .sugg-panel{
+    background:linear-gradient(160deg,#0e1b28,#0a1318);
+    border-left:1px solid var(--line2);width:100%;max-width:480px;
+    display:flex;flex-direction:column;overflow:hidden;
+    transform:translateX(40px);transition:transform .2s;
+  }
+  .sugg-overlay.open .sugg-panel{transform:translateX(0)}
+  .sugg-head{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--line);flex-shrink:0}
+  .sugg-head h3{font-family:Georgia,serif;font-size:18px;font-weight:700}
+  .sugg-head .sh-right{display:flex;align-items:center;gap:10px}
+  .btn-add-sugg{display:flex;align-items:center;gap:6px;background:rgba(26,144,128,.12);border:1px solid var(--teal);color:var(--teal-light);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;transition:.14s}
+  .btn-add-sugg:hover{background:rgba(26,144,128,.22)}
+  .sugg-list{overflow-y:auto;flex:1;padding:12px}
+  .sugg-list::-webkit-scrollbar{width:3px}
+  .sugg-list::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+  .sugg-empty{padding:48px;text-align:center;color:var(--ink-soft);font-size:13.5px;line-height:1.7}
+  .sugg-card{
+    background:rgba(255,255,255,.022);border:1px solid var(--line);
+    border-radius:13px;padding:14px 16px;margin-bottom:10px;
+  }
+  .sugg-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .sugg-card-name{font-size:14px;font-weight:800;color:var(--ink)}
+  .sugg-cat-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+  .sugg-cat-tag.badge{background:rgba(200,164,74,.1);color:var(--gold-light);border:1px solid rgba(200,164,74,.22)}
+  .sugg-cat-tag.food{background:rgba(26,144,128,.1);color:var(--teal-light);border:1px solid rgba(26,144,128,.22)}
+  .sugg-meta{font-size:12px;color:var(--ink-dim);margin-bottom:8px}
+  .sugg-note{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:10px}
+  .sugg-footer{display:flex;align-items:center;justify-content:space-between}
+  .sugg-time{font-size:11px;color:var(--ink-dim)}
+  .sugg-vote-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);background:transparent;color:var(--ink-soft);border-radius:7px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;transition:.14s}
+  .sugg-vote-btn:hover{border-color:var(--teal);color:var(--teal-light)}
+  .sugg-vote-btn.voted{border-color:var(--teal);color:var(--teal-light);background:rgba(26,144,128,.1);cursor:default}
+
+  /* ── TOAST ── */
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);
+    background:#1a2e3e;border:1px solid var(--line2);border-radius:10px;
+    padding:10px 18px;font-size:13px;font-weight:600;color:var(--ink);
+    z-index:2000;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;
+    white-space:nowrap;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -192,28 +233,20 @@
 
 <div class="topbar">
   <div class="brand"><b>7/16</b> 목<span class="brand-sub">당일치기 · 자가용 · 북한강</span></div>
-
-  <!-- 일정 플로우 탭 -->
   <div class="flow" id="tabs">
     <div style="font-size:12px;color:var(--ink-dim);padding:0 10px 0 0;white-space:nowrap">
       <span style="font-weight:700;color:var(--ink-soft)">📍 별내동</span>
-      <span style="display:block;font-size:10px;margin-top:1px;color:var(--ink-dim)">09:00 출발</span>
+      <span style="display:block;font-size:10px;margin-top:1px">09:00 출발</span>
     </div>
     <span class="flow-arrow">→</span>
     <div class="flow-step active" data-tab="badge">
       <span class="fs-icon">🏄</span>
-      <div>
-        <span class="fs-label">빠지</span>
-        <span class="fs-time">10:00 ~ 13:30</span>
-      </div>
+      <div><span class="fs-label">빠지</span><span class="fs-time">10:00 ~ 13:30</span></div>
     </div>
     <span class="flow-arrow">→</span>
     <div class="flow-step" data-tab="food">
       <span class="fs-icon">🍽</span>
-      <div>
-        <span class="fs-label">식사</span>
-        <span class="fs-time">14:00 ~ 15:00</span>
-      </div>
+      <div><span class="fs-label">식사</span><span class="fs-time">14:00 ~ 15:00</span></div>
     </div>
     <span class="flow-arrow">→</span>
     <div style="font-size:12px;color:var(--ink-dim);padding:0 8px;white-space:nowrap">
@@ -221,8 +254,9 @@
       <span style="display:block;font-size:10px;margin-top:1px">16:00 귀가</span>
     </div>
   </div>
-
-  <div class="topbar-right">평점 Google 기준 · 예약 전 확인 필수</div>
+  <div class="topbar-actions">
+    <button class="tb-btn teal" id="btnShowSugg">💡 제안 목록 <span class="sugg-cnt" id="suggCnt"></span></button>
+  </div>
 </div>
 
 <div class="layout" id="layout">
@@ -233,261 +267,329 @@
     </div>
     <div class="list-scroll" id="listScroll"></div>
   </div>
-
   <div class="detail-panel" id="detailPanel">
     <div class="detail-empty" id="detailEmpty">
       <div class="icon">☜</div>
-      <p>왼쪽에서 장소를 선택하면<br>상세 정보가 표시됩니다.</p>
+      <p>왼쪽에서 장소를 선택하면<br>상세 정보와 투표가 표시됩니다.</p>
     </div>
     <div class="detail-content" id="detailContent" style="display:none"></div>
   </div>
 </div>
 
+<!-- 제안 패널 -->
+<div class="sugg-overlay" id="suggOverlay">
+  <div class="sugg-panel">
+    <div class="sugg-head">
+      <h3>💡 장소 제안</h3>
+      <div class="sh-right">
+        <button class="btn-add-sugg" id="btnOpenModal">+ 새 제안</button>
+        <button style="background:transparent;border:none;color:var(--ink-soft);font-size:20px;cursor:pointer;padding:4px" id="btnCloseSugg">✕</button>
+      </div>
+    </div>
+    <div class="sugg-list" id="suggList">
+      <div class="sugg-empty">아직 제안된 장소가 없습니다.<br>+ 새 제안 버튼으로 추가해 보세요.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 제안 작성 모달 -->
+<div class="modal-overlay" id="suggModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>새 장소 제안</h3>
+      <button class="modal-close" id="btnCloseModal">✕</button>
+    </div>
+    <p class="modal-hint">가고 싶은 장소를 제안하면 다른 사람들이 투표할 수 있습니다.</p>
+    <form id="suggForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>장소 이름 *</label>
+          <input name="name" placeholder="예: 강촌 래프팅" required maxlength="40">
+        </div>
+        <div class="form-group">
+          <label>카테고리 *</label>
+          <select name="cat" required>
+            <option value="badge">🏄 빠지·액티비티</option>
+            <option value="food">🍽 식사</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>지역</label>
+        <input name="region" placeholder="예: 가평, 춘천 남산면" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label>추천 이유 / 설명</label>
+        <textarea name="note" placeholder="어떤 곳인지, 왜 가고 싶은지 간단히..." maxlength="200"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="btnCancelModal">취소</button>
+        <button type="submit" class="btn-submit" id="btnSubmit">제안 등록</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
 <script>
-const BADGE = [
-  {
-    name:"가평빠지 클럽비발디", cat:"badge", region:"가평",
-    lat:37.7523996, lng:127.5361849, rating:4.8, rc:42,
-    note:"워터파크형 수상레저. 안전교육 의무화, 시설 관리 양호 평가. 성수기 주말 사전예약 필수. 인근 식당가 접근 용이.",
-    url:"http://www.clubvivaldi.com/", tel:"010-8500-4714",
-    fromSeoul:"약 70km · 1시간 10분", priceRange:"성인 2만~4만원",
-    bestFor:["가족","단체","커플"], season:"6~8월",
-    facilities:["워터파크","튜브·보트","웨이크보드","바나나보트","샤워시설","주차"],
-  },
-  {
-    name:"가평빠지 캠프통포레스트", cat:"badge", region:"가평 서락면",
-    lat:37.7027985, lng:127.4921624, rating:4.3, rc:28,
-    note:"수영장·찜질방·사우나 병설. 물놀이 후 찜질로 마무리 가능. 성수기 대기 길다는 후기 있음.",
-    tel:"031-584-6000",
-    fromSeoul:"약 65km · 1시간", priceRange:"성인 1.5만~3만원",
-    bestFor:["가족","친구"], season:"6~8월",
-    facilities:["야외수영장","찜질방","사우나","바비큐","주차"],
-  },
-  {
-    name:"가평빠지 레저친구", cat:"badge", region:"춘천 남산면",
-    lat:37.7999422, lng:127.5305681, rating:4.8, rc:9, combo:true,
-    note:"수상레저+게스트하우스+저녁 바비큐 통합형. 당일치기로도 수상레저만 이용 가능한지 예약 시 확인 요망.",
-    url:"http://레저친구.com/", tel:"033-263-5513",
-    fromSeoul:"약 80km · 1시간 20분", priceRange:"당일 이용 요금 미확인",
-    bestFor:["친구","커플"], season:"5~9월",
-    facilities:["수상레저","강변","바비큐"],
-  },
-  {
-    name:"가평빠지 리버패리스", cat:"badge", region:"춘천 남산면",
-    lat:37.7750894, lng:127.5400144, rating:4.7, rc:3,
-    note:"웨이크보드 강습 전문. 강사 친절 평가. 후기 3건으로 신뢰도 낮음 — 예약 전 직접 확인 권장.",
-    tel:"010-3835-4777",
-    fromSeoul:"약 78km · 1시간 15분", priceRange:"강습 요금 미확인",
-    bestFor:["웨이크보드 입문","커플"], season:"5~9월",
-    facilities:["웨이크보드","강습"],
-  },
-  {
-    name:"가평빠지 블랙수상레저", cat:"badge", region:"가평",
-    lat:37.7738435, lng:127.5348004, rating:5.0, rc:3,
-    note:"바나나보트·땅콩보트 단체 이용 후기. 후기 3건으로 평점 신뢰도 매우 낮음. 단체 예약 특화.",
-    tel:"010-7272-2182",
-    fromSeoul:"약 70km · 1시간 10분", priceRange:"단체 요금 미확인",
-    bestFor:["단체","워크숍"], season:"6~8월",
-    facilities:["바나나보트","땅콩보트","단체 대관"],
-  },
-];
-
-const FOOD = [
-  /* 춘천 */
-  {
-    name:"춘천 명동 닭갈비 골목", cat:"food", foodType:"닭갈비", region:"춘천 명동",
-    lat:37.8760, lng:127.7270, rating:4.3, rc:null,
-    note:"춘천 대표 먹거리 닭갈비 골목. 철판 닭갈비 + 볶음밥 코스가 정석. 최소 10여 개 가게 밀집. 주말 웨이팅 있음. 빠지(춘천 남산면) 이용 후 이동 15~20분.",
-    fromBaji:"춘천 남산면 빠지에서 약 15~20분",
-    priceRange:"1인 1만~1.5만원",
-    bestFor:["전체"], openHours:"11:00~21:00 (가게별 상이)",
-    must:"볶음밥 추가 필수 · 냉면 후식",
-    facilities:["주차 가능(인근 유료)","포장 가능"],
-    tel:null, url:null,
-  },
-  {
-    name:"유포리 막국수", cat:"food", foodType:"막국수", region:"춘천 신북읍",
-    lat:37.9192, lng:127.6940, rating:4.4, rc:null,
-    note:"춘천 3대 막국수 중 하나로 꼽히는 곳. 메밀 향 강한 전통 스타일. 빠지 후 시원한 냉면 대용으로 최적. 물막국수·비빔막국수 선택.",
-    fromBaji:"가평 빠지에서 약 40분, 춘천 남산면에서 약 30분",
-    priceRange:"1인 9,000~12,000원",
-    bestFor:["전체"], openHours:"10:30~19:30 (재료 소진 시 조기 마감)",
-    must:"물막국수 + 편육 조합",
-    facilities:["주차 가능","포장 가능"],
-    tel:"033-242-5168", url:null,
-  },
-  {
-    name:"샘밭 막국수", cat:"food", foodType:"막국수", region:"춘천 신북읍",
-    lat:37.9178, lng:127.6955, rating:4.5, rc:null,
-    note:"유포리 막국수 인근 경쟁점. 깔끔한 육수 스타일로 호불호 적음. 대기 줄이 길 경우 번갈아 방문 고려.",
-    fromBaji:"가평 빠지에서 약 40분",
-    priceRange:"1인 9,000~13,000원",
-    bestFor:["전체"], openHours:"10:30~19:00",
-    must:"비빔막국수 인기",
-    facilities:["주차 가능"],
-    tel:"033-244-0885", url:null,
-  },
-  /* 가평 */
-  {
-    name:"가평 잣두부마을 (잣골두부)", cat:"food", foodType:"두부찌개", region:"가평읍",
-    lat:37.8314, lng:127.5115, rating:4.2, rc:null,
-    note:"가평 특산 잣을 넣은 두부찌개 전문 식당가. 고소하고 담백한 국물. 빠지 후 따뜻한 찌개류 원할 때 최적. 가평읍내 여러 식당 분포.",
-    fromBaji:"가평 빠지에서 약 10~15분",
-    priceRange:"1인 1만~1.5만원",
-    bestFor:["전체"], openHours:"11:00~20:00 (가게별 상이)",
-    must:"잣두부찌개 + 공기밥",
-    facilities:["주차 가능"],
-    tel:null, url:null,
-  },
-  {
-    name:"북한강 민물매운탕 (가평)", cat:"food", foodType:"매운탕", region:"가평 북한강변",
-    lat:37.7980, lng:127.5122, rating:4.1, rc:null,
-    note:"북한강 인근 민물매운탕 전문 식당가. 빠지 직후 이동 거리 짧음. 쏘가리·메기·잉어탕 등. 여름 성수기 웨이팅 있음.",
-    fromBaji:"가평 빠지에서 5~10분",
-    priceRange:"2~3인 4만~7만원 (탕 기준)",
-    bestFor:["전체"], openHours:"10:30~20:30",
-    must:"쏘가리탕 or 메기탕",
-    facilities:["강변 테라스 일부","주차 가능"],
-    tel:null, url:null,
-  },
-  {
-    name:"가평 경강막국수", cat:"food", foodType:"막국수", region:"가평읍",
-    lat:37.8290, lng:127.5090, rating:4.3, rc:null,
-    note:"가평읍내 막국수 전문점. 춘천까지 이동하기 부담스러울 때 대안. 육수 깔끔, 면 탄력 좋다는 후기.",
-    fromBaji:"가평 빠지에서 약 10~15분",
-    priceRange:"1인 8,000~11,000원",
-    bestFor:["전체"], openHours:"10:00~19:00",
-    must:"물막국수 + 수육",
-    facilities:["주차 가능","포장 가능"],
-    tel:null, url:null,
-  },
-];
-
-const state = { tab:'badge', selectedIdx:null };
-
-const TAB_META = {
-  badge:{ label:'STEP 1', title:'빠지 선택' },
-  food:{ label:'STEP 2', title:'식사 장소 선택' },
+/* ── Firebase ── */
+const firebaseConfig = {
+  apiKey: "AIzaSyCX0W6-YevWhV3nRlGgIEWEIX0sQYwu8aw",
+  authDomain: "bukhangang-planner.firebaseapp.com",
+  databaseURL: "https://bukhangang-planner-default-rtdb.firebaseio.com",
+  projectId: "bukhangang-planner",
+  storageBucket: "bukhangang-planner.firebasestorage.app",
+  messagingSenderId: "907356091010",
+  appId: "1:907356091010:web:3ad7f2f33c5c7542047a9b"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-function switchTab(tab){
-  state.tab = tab;
-  state.selectedIdx = null;
+/* ── PLACES DATA ── */
+const BADGE = [
+  {name:"가평빠지 클럽비발디",cat:"badge",region:"가평",lat:37.7523996,lng:127.5361849,rating:4.8,rc:42,note:"워터파크형 수상레저. 안전교육 의무화, 시설 관리 양호. 성수기 사전예약 필수.",url:"http://www.clubvivaldi.com/",tel:"010-8500-4714",fromSeoul:"약 70km · 1시간 10분",priceRange:"성인 2만~4만원",bestFor:["가족","단체","커플"],season:"6~8월",facilities:["워터파크","튜브·보트","웨이크보드","바나나보트","샤워시설","주차"]},
+  {name:"가평빠지 캠프통포레스트",cat:"badge",region:"가평 서락면",lat:37.7027985,lng:127.4921624,rating:4.3,rc:28,note:"수영장·찜질방·사우나 병설. 물놀이 후 찜질 가능. 성수기 대기 있음.",tel:"031-584-6000",fromSeoul:"약 65km · 1시간",priceRange:"성인 1.5만~3만원",bestFor:["가족","친구"],season:"6~8월",facilities:["야외수영장","찜질방","사우나","바비큐","주차"]},
+  {name:"가평빠지 레저친구",cat:"badge",region:"춘천 남산면",lat:37.7999422,lng:127.5305681,rating:4.8,rc:9,combo:true,note:"수상레저+숙박+바비큐 통합형. 당일 수상레저만 이용 가능 여부 예약 시 확인 요망.",url:"http://레저친구.com/",tel:"033-263-5513",fromSeoul:"약 80km · 1시간 20분",priceRange:"당일 이용 요금 미확인",bestFor:["친구","커플"],season:"5~9월",facilities:["수상레저","강변","바비큐"]},
+  {name:"가평빠지 리버패리스",cat:"badge",region:"춘천 남산면",lat:37.7750894,lng:127.5400144,rating:4.7,rc:3,note:"웨이크보드 강습 전문. 후기 3건으로 신뢰도 낮음.",tel:"010-3835-4777",fromSeoul:"약 78km · 1시간 15분",priceRange:"강습 요금 미확인",bestFor:["웨이크보드 입문","커플"],season:"5~9월",facilities:["웨이크보드","강습"]},
+  {name:"가평빠지 블랙수상레저",cat:"badge",region:"가평",lat:37.7738435,lng:127.5348004,rating:5.0,rc:3,note:"바나나보트·땅콩보트 단체 후기. 후기 3건으로 평점 신뢰도 매우 낮음.",tel:"010-7272-2182",fromSeoul:"약 70km · 1시간 10분",priceRange:"단체 요금 미확인",bestFor:["단체"],season:"6~8월",facilities:["바나나보트","땅콩보트","단체 대관"]},
+];
+const FOOD = [
+  {name:"춘천 명동 닭갈비 골목",cat:"food",foodType:"닭갈비",region:"춘천 명동",lat:37.8760,lng:127.7270,rating:4.3,note:"춘천 대표 닭갈비 골목. 철판 닭갈비+볶음밥 코스 정석. 주말 웨이팅 있음.",fromBaji:"춘천 남산면에서 약 15~20분",priceRange:"1인 1만~1.5만원",openHours:"11:00~21:00 (가게별 상이)",must:"볶음밥 추가 필수 · 냉면 후식",facilities:["주차(인근 유료)","포장 가능"]},
+  {name:"유포리 막국수",cat:"food",foodType:"막국수",region:"춘천 신북읍",lat:37.9192,lng:127.6940,rating:4.4,note:"춘천 3대 막국수. 메밀 향 강한 전통 스타일. 재료 소진 시 조기 마감.",fromBaji:"가평 빠지에서 약 40분",priceRange:"1인 9,000~12,000원",openHours:"10:30~19:30",must:"물막국수 + 편육",facilities:["주차 가능","포장 가능"],tel:"033-242-5168"},
+  {name:"샘밭 막국수",cat:"food",foodType:"막국수",region:"춘천 신북읍",lat:37.9178,lng:127.6955,rating:4.5,note:"유포리 인근 경쟁점. 깔끔한 육수. 유포리 줄 길면 대안.",fromBaji:"가평 빠지에서 약 40분",priceRange:"1인 9,000~13,000원",openHours:"10:30~19:00",must:"비빔막국수 인기",facilities:["주차 가능"],tel:"033-244-0885"},
+  {name:"가평 잣두부마을",cat:"food",foodType:"두부찌개",region:"가평읍",lat:37.8314,lng:127.5115,rating:4.2,note:"가평 특산 잣 두부찌개 전문 식당가. 고소하고 담백. 빠지 직후 따뜻한 식사.",fromBaji:"가평 빠지에서 약 10~15분",priceRange:"1인 1만~1.5만원",openHours:"11:00~20:00",must:"잣두부찌개 + 공기밥",facilities:["주차 가능"]},
+  {name:"북한강 민물매운탕",cat:"food",foodType:"매운탕",region:"가평 북한강변",lat:37.7980,lng:127.5122,rating:4.1,note:"북한강 인근 매운탕 식당가. 쏘가리·메기·잉어탕. 빠지 직후 이동 5~10분.",fromBaji:"가평 빠지에서 5~10분",priceRange:"2~3인 4만~7만원",openHours:"10:30~20:30",must:"쏘가리탕 or 메기탕",facilities:["강변 테라스","주차 가능"]},
+  {name:"가평 경강막국수",cat:"food",foodType:"막국수",region:"가평읍",lat:37.8290,lng:127.5090,rating:4.3,note:"가평읍내 막국수. 춘천 이동 부담 시 대안. 육수 깔끔, 면 탄력 양호.",fromBaji:"가평 빠지에서 약 10~15분",priceRange:"1인 8,000~11,000원",openHours:"10:00~19:00",must:"물막국수 + 수육",facilities:["주차 가능","포장 가능"]},
+];
+
+/* ── STATE ── */
+const state = { tab:'badge', selectedIdx:null };
+const voteCounts = {}; // placeId -> count (realtime)
+let voteListeners = {}; // active listeners
+
+function placeId(p) {
+  const list = p.cat === 'badge' ? BADGE : FOOD;
+  return p.cat + '_' + list.indexOf(p);
+}
+
+/* ── FIRESTORE: VOTES ── */
+function subscribeVotes() {
+  // Listen to all vote docs
+  db.collection('votes').onSnapshot(snap => {
+    snap.forEach(d => { voteCounts[d.id] = d.data().count || 0; });
+    refreshVoteCounts();
+  });
+}
+
+function refreshVoteCounts() {
+  // update list item vote badges
+  document.querySelectorAll('.item-votes').forEach(el => {
+    const pid = el.dataset.pid;
+    const c = voteCounts[pid] || 0;
+    el.textContent = c > 0 ? `👍 ${c}` : '';
+    el.classList.toggle('has-votes', c > 0);
+  });
+  // update detail panel if open
+  const vnum = document.getElementById('voteNum');
+  const vpid = document.getElementById('detailContent')?.dataset.pid;
+  if (vnum && vpid) vnum.textContent = voteCounts[vpid] || 0;
+}
+
+async function doVote(pid) {
+  const key = 'voted_' + pid;
+  if (localStorage.getItem(key)) { showToast('이미 투표했습니다 👍'); return; }
+  try {
+    await db.collection('votes').doc(pid).set(
+      { count: firebase.firestore.FieldValue.increment(1) },
+      { merge: true }
+    );
+    localStorage.setItem(key, '1');
+    // update UI
+    const btn = document.getElementById('voteBtn');
+    if (btn) { btn.classList.add('voted'); btn.disabled = true; btn.querySelector('.vote-text').textContent = '투표 완료 ✓'; }
+    showToast('투표했습니다! 👍');
+  } catch(e) { showToast('오류가 발생했습니다. 다시 시도해 주세요.'); console.error(e); }
+}
+
+/* ── FIRESTORE: SUGGESTIONS ── */
+function subscribeSuggestions() {
+  db.collection('suggestions').orderBy('createdAt', 'desc').onSnapshot(snap => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSuggestions(items);
+    // update count badge
+    const cnt = document.getElementById('suggCnt');
+    if (items.length > 0) { cnt.textContent = items.length; cnt.classList.add('show'); }
+    else { cnt.classList.remove('show'); }
+  });
+}
+
+function renderSuggestions(items) {
+  const wrap = document.getElementById('suggList');
+  if (!items.length) {
+    wrap.innerHTML = '<div class="sugg-empty">아직 제안된 장소가 없습니다.<br>+ 새 제안 버튼으로 추가해 보세요.</div>';
+    return;
+  }
+  wrap.innerHTML = items.map(s => {
+    const voted = !!localStorage.getItem('svoted_' + s.id);
+    const catLabel = s.cat === 'badge' ? '빠지' : '식사';
+    const ago = s.createdAt ? timeAgo(s.createdAt.toDate()) : '';
+    return `<div class="sugg-card">
+      <div class="sugg-card-top">
+        <div class="sugg-card-name">${escHtml(s.name)}</div>
+        <span class="sugg-cat-tag ${s.cat}">${catLabel}</span>
+      </div>
+      ${s.region ? `<div class="sugg-meta">📍 ${escHtml(s.region)}</div>` : ''}
+      ${s.note ? `<div class="sugg-note">${escHtml(s.note)}</div>` : ''}
+      <div class="sugg-footer">
+        <span class="sugg-time">${ago}</span>
+        <button class="sugg-vote-btn${voted?' voted':''}" data-sid="${s.id}" ${voted?'disabled':''}>
+          👍 ${s.votes || 0}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  // attach vote handlers
+  wrap.querySelectorAll('.sugg-vote-btn:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sid = btn.dataset.sid;
+      const key = 'svoted_' + sid;
+      if (localStorage.getItem(key)) return;
+      try {
+        await db.collection('suggestions').doc(sid).update({ votes: firebase.firestore.FieldValue.increment(1) });
+        localStorage.setItem(key, '1');
+        showToast('제안에 투표했습니다 👍');
+      } catch(e) { showToast('오류 발생. 다시 시도해 주세요.'); }
+    });
+  });
+}
+
+async function submitSuggestion(data) {
+  await db.collection('suggestions').add({
+    ...data,
+    votes: 0,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+/* ── UI HELPERS ── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(date) {
+  const diff = Math.floor((Date.now() - date) / 1000);
+  if (diff < 60) return '방금 전';
+  if (diff < 3600) return Math.floor(diff/60) + '분 전';
+  if (diff < 86400) return Math.floor(diff/3600) + '시간 전';
+  return Math.floor(diff/86400) + '일 전';
+}
+
+/* ── TAB / LIST ── */
+const TAB_META = { badge:{label:'STEP 1',title:'빠지 선택'}, food:{label:'STEP 2',title:'식사 장소 선택'} };
+
+function switchTab(tab) {
+  state.tab = tab; state.selectedIdx = null;
   document.querySelectorAll('.flow-step[data-tab]').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.getElementById('hLabel').textContent = TAB_META[tab].label;
   document.getElementById('hTitle').textContent = TAB_META[tab].title;
-  renderList();
-  showEmpty();
+  renderList(); showEmpty();
 }
 
-function renderList(){
+function renderList() {
   const wrap = document.getElementById('listScroll');
   wrap.innerHTML = '';
-
-  if(state.tab === 'badge'){
+  if (state.tab === 'badge') {
     BADGE.forEach((p, i) => appendItem(wrap, p, i + 1, false));
   } else {
-    const groups = [
-      { label:'춘천 권역', color:'var(--teal)', items: FOOD.filter(f => f.region.startsWith('춘천')) },
-      { label:'가평 권역', color:'#a0c878', items: FOOD.filter(f => f.region.startsWith('가평')) },
-    ];
-    groups.forEach(g => {
-      const gl = document.createElement('div');
-      gl.className = 'list-group-label';
-      gl.innerHTML = `<i style="background:${g.color}"></i>${g.label}`;
-      wrap.appendChild(gl);
-      let n = 1;
-      g.items.forEach(p => appendItem(wrap, p, n++, true));
+    [['춘천 권역','var(--teal)', FOOD.filter(f=>f.region.startsWith('춘천'))],
+     ['가평 권역','#a0c878',    FOOD.filter(f=>f.region.startsWith('가평'))]
+    ].forEach(([label, color, items]) => {
+      const gl = document.createElement('div'); gl.className = 'list-group-label';
+      gl.innerHTML = `<i style="background:${color}"></i>${label}`; wrap.appendChild(gl);
+      items.forEach((p, i) => appendItem(wrap, p, i + 1, true));
     });
   }
 }
 
-function appendItem(wrap, p, num, isFood){
-  const allItems = state.tab === 'badge' ? BADGE : FOOD;
-  const idx = allItems.indexOf(p);
+function appendItem(wrap, p, num, isFood) {
+  const list = isFood ? FOOD : BADGE;
+  const idx = list.indexOf(p);
+  const pid = placeId(p);
   const el = document.createElement('div');
   el.className = 'list-item' + (state.selectedIdx === idx ? ' active' : '') + (isFood ? ' food-item' : '');
   el.dataset.idx = idx;
-
   const tags = [];
-  if(p.combo) tags.push(`<span class="item-tag-sm combo">통합형</span>`);
-  if(p.foodType) tags.push(`<span class="item-tag-sm food">${p.foodType}</span>`);
-
-  const starColor = isFood ? ' teal' : '';
-  const displayName = p.name.replace(/^가평빠지 /,'');
-
+  if (p.combo) tags.push(`<span class="item-tag-sm combo">통합형</span>`);
+  if (p.foodType) tags.push(`<span class="item-tag-sm food">${p.foodType}</span>`);
+  const vc = voteCounts[pid] || 0;
   el.innerHTML = `
     <div class="item-num">${num}</div>
     <div class="item-body">
-      <div class="item-name">${displayName} ${tags.join('')}</div>
+      <div class="item-name">${p.name.replace(/^가평빠지 /,'')} ${tags.join('')}</div>
       <div class="item-sub">${p.region}</div>
     </div>
-    ${p.rating ? `<div class="item-star${starColor}">★ ${p.rating.toFixed(1)}</div>` : ''}`;
-
-  el.addEventListener('click', () => {
-    state.selectedIdx = idx;
-    renderList();
-    renderDetail(p, isFood);
-  });
+    <div class="item-right">
+      ${p.rating ? `<div class="item-star${isFood?' teal':''}">★ ${p.rating.toFixed(1)}</div>` : ''}
+      <div class="item-votes${vc>0?' has-votes':''}" data-pid="${pid}">${vc>0?'👍 '+vc:''}</div>
+    </div>`;
+  el.addEventListener('click', () => { state.selectedIdx = idx; renderList(); renderDetail(p, isFood); });
   wrap.appendChild(el);
 }
 
-function showEmpty(){
+function showEmpty() {
   document.getElementById('detailEmpty').style.display = 'flex';
   document.getElementById('detailContent').style.display = 'none';
 }
 
-function renderDetail(p, isFood){
+/* ── DETAIL ── */
+function renderDetail(p, isFood) {
+  const pid = placeId(p);
   const low = p.rc !== null && p.rc < 15;
   const catLabel = isFood ? (p.foodType || '식사') : '빠지';
   const catClass = isFood ? 'food' : 'badge';
   const mapsUrl = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
   const osmEmbed = `https://www.openstreetmap.org/export/embed.html?bbox=${p.lng-.018},${p.lat-.012},${p.lng+.018},${p.lat+.012}&layer=mapnik&marker=${p.lat},${p.lng}`;
+  const voted = !!localStorage.getItem('voted_' + pid);
+  const vc = voteCounts[pid] || 0;
 
   const infoCards = [];
-  if(p.priceRange) infoCards.push(`<div class="info-card"><div class="ic-label">가격대</div><div class="ic-val ${isFood?'hl-teal':'hl'}">${p.priceRange}</div></div>`);
-  if(p.fromSeoul) infoCards.push(`<div class="info-card"><div class="ic-label">서울에서</div><div class="ic-val">${p.fromSeoul}</div></div>`);
-  if(p.fromBaji) infoCards.push(`<div class="info-card"><div class="ic-label">빠지에서 이동</div><div class="ic-val">${p.fromBaji}</div></div>`);
-  if(p.openHours) infoCards.push(`<div class="info-card"><div class="ic-label">운영 시간</div><div class="ic-val">${p.openHours}</div></div>`);
-  if(p.season) infoCards.push(`<div class="info-card"><div class="ic-label">운영 시즌</div><div class="ic-val">${p.season}</div></div>`);
-  if(p.bestFor) infoCards.push(`<div class="info-card"><div class="ic-label">추천</div><div class="ic-val">${p.bestFor.join(' · ')}</div></div>`);
-
-  const facilitiesHtml = (p.facilities || []).map(f => `<span class="fac">${f}</span>`).join('');
+  if (p.priceRange) infoCards.push(`<div class="info-card"><div class="ic-label">가격대</div><div class="ic-val ${isFood?'hl-teal':'hl'}">${p.priceRange}</div></div>`);
+  if (p.fromSeoul) infoCards.push(`<div class="info-card"><div class="ic-label">서울에서</div><div class="ic-val">${p.fromSeoul}</div></div>`);
+  if (p.fromBaji) infoCards.push(`<div class="info-card"><div class="ic-label">빠지에서 이동</div><div class="ic-val">${p.fromBaji}</div></div>`);
+  if (p.openHours) infoCards.push(`<div class="info-card"><div class="ic-label">운영 시간</div><div class="ic-val">${p.openHours}</div></div>`);
+  if (p.season) infoCards.push(`<div class="info-card"><div class="ic-label">운영 시즌</div><div class="ic-val">${p.season}</div></div>`);
+  if (p.bestFor) infoCards.push(`<div class="info-card"><div class="ic-label">추천</div><div class="ic-val">${p.bestFor.join(' · ')}</div></div>`);
+  const facilitiesHtml = (p.facilities||[]).map(f=>`<span class="fac">${f}</span>`).join('');
 
   document.getElementById('detailEmpty').style.display = 'none';
   const dc = document.getElementById('detailContent');
-  dc.style.display = '';
+  dc.style.display = ''; dc.dataset.pid = pid;
   dc.innerHTML = `
     <div class="d-top">
       <div class="d-name">${p.name.replace(/^가평빠지 /,'')}</div>
       <span class="d-ctag ${catClass}">${catLabel}</span>
     </div>
     <div class="d-meta">
-      ${p.rating ? `<span class="d-stars${isFood?' teal':''}">★ ${p.rating.toFixed(1)}</span><span style="color:var(--ink-dim)">·</span>` : ''}
-      ${p.rc ? `<span>후기 ${p.rc}건</span>` : (isFood ? `<span style="color:var(--ink-dim)">Google 기준</span>` : '')}
+      ${p.rating?`<span class="d-stars${isFood?' teal':''}">★ ${p.rating.toFixed(1)}</span><span style="color:var(--ink-dim)">·</span>`:''}
+      ${p.rc?`<span>후기 ${p.rc}건</span>`:''}
       <span class="d-region">${p.region}</span>
     </div>
-    ${infoCards.length ? `<div class="info-grid">${infoCards.join('')}</div>` : ''}
+    ${infoCards.length?`<div class="info-grid">${infoCards.join('')}</div>`:''}
     <div class="d-section">
       <div class="d-section-lbl">장소 정보</div>
       <div class="d-note">${p.note}</div>
     </div>
-    ${p.must ? `
-    <div class="d-section">
-      <div class="d-section-lbl">추천 메뉴 · 팁</div>
-      <div class="d-note" style="border-color:rgba(26,144,128,.25)">🍴 ${p.must}</div>
-    </div>` : ''}
-    ${facilitiesHtml ? `
-    <div class="d-section">
-      <div class="d-section-lbl">${isFood ? '편의' : '시설 · 특징'}</div>
-      <div class="facilities">${facilitiesHtml}</div>
-    </div>` : ''}
-    ${(p.combo || low) ? `
-    <div class="d-flags">
-      ${p.combo ? '<span class="flag combo">숙박+빠지 통합형(추정)</span>' : ''}
-      ${low ? '<span class="flag lowrel">후기 표본 작음 · 신뢰도 낮음</span>' : ''}
-      ${isFood && !p.rc ? '<span class="flag rec">Google 리뷰 직접 확인 권장</span>' : ''}
-    </div>` : (isFood ? `<div class="d-flags"><span class="flag rec">방문 전 영업 여부 확인 권장</span></div>` : '')}
+    ${p.must?`<div class="d-section"><div class="d-section-lbl">추천 메뉴 · 팁</div><div class="d-note" style="border-color:rgba(26,144,128,.25)">🍴 ${p.must}</div></div>`:''}
+    ${facilitiesHtml?`<div class="d-section"><div class="d-section-lbl">${isFood?'편의':'시설·특징'}</div><div class="facilities">${facilitiesHtml}</div></div>`:''}
+    ${(p.combo||low)?`<div class="d-flags">${p.combo?'<span class="flag combo">숙박+빠지 통합형(추정)</span>':''}${low?'<span class="flag lowrel">후기 표본 작음</span>':''}</div>`:''}
     <div class="d-section">
       <div class="d-section-lbl">위치</div>
       <div class="map-wrap">
@@ -496,23 +598,67 @@ function renderDetail(p, isFood){
       </div>
     </div>
     <div class="d-links">
-      ${p.url ? `<a class="d-link" href="${p.url}" target="_blank" rel="noopener">🔗 웹사이트</a>` : ''}
-      ${p.tel ? `<a class="d-link ${isFood?'teal':''}" href="tel:${p.tel.replace(/[^0-9+]/g,'')}">📞 ${p.tel}</a>` : ''}
-      <a class="d-link ${isFood?'teal':''}" href="${mapsUrl}" target="_blank" rel="noopener">📍 지도</a>
+      ${p.url?`<a class="d-link" href="${p.url}" target="_blank" rel="noopener">🔗 웹사이트</a>`:''}
+      ${p.tel?`<a class="d-link" href="tel:${p.tel.replace(/[^0-9+]/g,'')}">📞 ${p.tel}</a>`:''}
+      <a class="d-link" href="${mapsUrl}" target="_blank" rel="noopener">📍 지도</a>
+    </div>
+    <div class="d-section-lbl" style="margin-bottom:10px">이 장소 어때요?</div>
+    <div class="vote-section">
+      <button class="vote-btn${voted?' voted':''}" id="voteBtn" ${voted?'disabled':''}>
+        <span class="vote-num" id="voteNum">${vc}</span>
+        👍 <span class="vote-text">${voted?'투표 완료 ✓':'가고 싶어요'}</span>
+      </button>
+      <div class="vote-label"><b>${voted?'투표해 주셨습니다!':'이 장소에 투표하세요'}</b>모든 사람의 투표가 실시간 반영됩니다.</div>
     </div>`;
+
+  if (!voted) {
+    document.getElementById('voteBtn').addEventListener('click', () => doVote(pid));
+  }
 }
 
+/* ── MODAL / PANEL EVENTS ── */
+function openSuggPanel() { document.getElementById('suggOverlay').classList.add('open'); }
+function closeSuggPanel() { document.getElementById('suggOverlay').classList.remove('open'); }
+function openSuggModal() { document.getElementById('suggModal').classList.add('open'); }
+function closeSuggModal() { document.getElementById('suggModal').classList.remove('open'); document.getElementById('suggForm').reset(); }
+
+document.getElementById('btnShowSugg').addEventListener('click', openSuggPanel);
+document.getElementById('btnCloseSugg').addEventListener('click', closeSuggPanel);
+document.getElementById('btnOpenModal').addEventListener('click', openSuggModal);
+document.getElementById('btnCloseModal').addEventListener('click', closeSuggModal);
+document.getElementById('btnCancelModal').addEventListener('click', closeSuggModal);
+document.getElementById('suggOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSuggPanel(); });
+document.getElementById('suggModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeSuggModal(); });
+
+document.getElementById('suggForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = { name: fd.get('name').trim(), cat: fd.get('cat'), region: fd.get('region').trim(), note: fd.get('note').trim() };
+  if (!data.name) return;
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = '등록 중...';
+  try {
+    await submitSuggestion(data);
+    closeSuggModal(); openSuggPanel();
+    showToast('제안이 등록되었습니다! 💡');
+  } catch(err) { showToast('오류 발생. 다시 시도해 주세요.'); console.error(err); }
+  finally { btn.disabled = false; btn.textContent = '제안 등록'; }
+});
+
+/* ── FLOW TAB CLICK ── */
 document.querySelectorAll('.flow-step[data-tab]').forEach(t => {
   t.addEventListener('click', () => switchTab(t.dataset.tab));
 });
 
-function fixHeight(){
+/* ── INIT ── */
+function fixHeight() {
   const tbar = document.querySelector('.topbar').offsetHeight;
   document.getElementById('layout').style.height = (window.innerHeight - tbar) + 'px';
 }
-window.addEventListener('resize', fixHeight);
-fixHeight();
+window.addEventListener('resize', fixHeight); fixHeight();
 
+subscribeVotes();
+subscribeSuggestions();
 switchTab('badge');
 </script>
 </body>

@@ -6,193 +6,347 @@
 <title>1박2일 빠지 여행 플래너 · 7/16–17</title>
 <style>
   :root{
-    --bg:#050c12;
-    --bg2:#07111a;
-    --panel:#0c1d2b;
-    --panel2:#0f2436;
-    --ink:#ddeef6;
-    --ink-soft:#7aafc4;
-    --line:#1a3a52;
-    --river:#2fa8cc;
-    --river-deep:#1a6a85;
-    --sun:#e8a83a;
-    --coral:#d06848;
-    --moss:#6aa87a;
-    --warn:#d8904a;
-    --shadow:0 12px 40px rgba(0,0,0,.7);
+    --bg:#080c10;
+    --bg2:#0a0f15;
+    --panel:#0e1520;
+    --panel2:#121c2a;
+    --ink:#e4ddd0;
+    --ink-soft:#7a8c9c;
+    --ink-dim:#2e3e4e;
+    --line:#1a2a3a;
+    --line2:#243244;
+    --gold:#c8a44a;
+    --gold-light:#e2be72;
+    --gold-dim:#5a4418;
+    --river:#2280b8;
+    --river-bright:#3aa0d8;
+    --coral:#c05838;
+    --moss:#4e9060;
+    --warn:#c07828;
+    --shadow:0 8px 36px rgba(0,0,0,.65);
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    margin:0;font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
     background:
-      radial-gradient(130% 70% at 80% -10%, #0e2235 0%, transparent 50%),
-      radial-gradient(80% 50% at 0% 110%, #08161f 0%, transparent 50%),
+      radial-gradient(ellipse 140% 55% at 75% -8%, #0d1e30 0%, transparent 55%),
+      radial-gradient(ellipse 70% 45% at -5% 105%, #0a1520 0%, transparent 50%),
       var(--bg);
-    color:var(--ink);line-height:1.55;
+    color:var(--ink);line-height:1.6;min-height:100vh;
   }
-  .wrap{max-width:920px;margin:0 auto;padding:30px 22px 64px}
+  /* grain */
+  body::after{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity:.04;
+  }
 
-  header.hero{padding:18px 0 6px}
-  .dateline{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-top:8px}
-  .dateline .big{font-size:clamp(34px,6vw,58px);font-weight:800;letter-spacing:-.02em;line-height:1}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+
+  /* ── HEADER ── */
+  header.hero{
+    padding-bottom:26px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:32px;
+  }
+  .dateline{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .dateline .big{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(42px,7.5vw,68px);
+    font-weight:700;letter-spacing:-.03em;line-height:1;
+  }
   .dateline .big b{
-    background:linear-gradient(95deg,var(--river),var(--sun));
+    background:linear-gradient(105deg,var(--gold-light) 10%,var(--gold) 80%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .dateline .days{font-size:14px;color:var(--ink-soft);font-weight:600}
-  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-size:13px;color:var(--ink-soft)}
-  .meta b{color:var(--ink)}
+  .dateline .big .sep{color:var(--ink-dim);font-weight:300;margin:0 6px}
+  .dateline .sub{font-size:14px;color:var(--ink-soft);font-weight:500;letter-spacing:.03em;align-self:center}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:12.5px;color:var(--ink-soft)}
+  .meta b{color:var(--ink);font-weight:600}
 
-  /* BUILDER */
-  .builder{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px;margin:22px 0 18px}
-  .builder h2{margin:0 0 4px;font-size:15px;letter-spacing:.02em}
-  .builder .hint{margin:0 0 14px;font-size:12.5px;color:var(--ink-soft)}
-  .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:720px){.bgrid{grid-template-columns:1fr}}
-  .bcol h3{margin:0 0 9px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:7px}
-  .bcol h3 i{width:9px;height:9px;border-radius:50%;display:inline-block}
-  .opts{display:flex;flex-direction:column;gap:7px}
-  .opt{
-    display:flex;justify-content:space-between;align-items:center;gap:8px;
-    border:1.5px solid var(--line);background:var(--panel2);border-radius:11px;
-    padding:9px 12px;cursor:pointer;transition:.15s;font-size:13.5px;
+  /* ── BUILDER ── */
+  .builder{
+    background:linear-gradient(150deg,#101d2c 0%,#0c1620 100%);
+    border:1px solid var(--line2);
+    border-radius:20px;
+    box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.035);
+    padding:26px 24px 22px;
+    margin-bottom:28px;
   }
-  .opt:hover{border-color:var(--river)}
-  .opt.sel{border-color:var(--river);background:#0e2d44;box-shadow:inset 0 0 0 1px var(--river)}
-  .opt .nm{font-weight:700}
-  .opt .rt{font-size:12px;color:var(--sun);font-weight:800;white-space:nowrap}
-  .opt .sub{display:block;font-size:11px;color:var(--ink-soft);font-weight:500;margin-top:2px}
-  .acc-group{margin-bottom:10px}
-  .acc-group .gl{font-size:11px;font-weight:700;color:var(--ink-soft);margin:0 0 5px;display:flex;align-items:center;gap:6px}
-  .acc-group .gl i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .builder-title{
+    font-size:14px;font-weight:700;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .builder-hint{font-size:12.5px;color:var(--ink-dim);margin-bottom:22px;line-height:1.5}
 
-  .result{margin-top:16px;border-top:1px dashed var(--line);padding-top:15px}
-  .result.empty{color:var(--ink-soft);font-size:13px}
-  .combo-card{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:14px}
-  .combo-card .leg{display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:8px 13px}
-  .combo-card .leg .tag{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
-  .combo-card .leg .nm{font-weight:800}
-  .combo-card .arrow{color:var(--river);font-size:20px}
-  .combo-card .dist{font-size:12.5px;color:var(--ink-soft);background:#07121c;border:1px solid var(--line);padding:6px 11px;border-radius:999px}
-  .combo-card .dist b{color:var(--river)}
-  .resetbtn{margin-left:auto;border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:999px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer}
+  .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:660px){.bgrid{grid-template-columns:1fr}}
+
+  .bcol-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .step-badge{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--gold-light),var(--gold));
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;color:#060a0e;
+    box-shadow:0 2px 10px rgba(200,164,74,.35);
+  }
+  .bcol-head h3{
+    font-size:11px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.018);
+    border-radius:11px;padding:10px 14px;cursor:pointer;
+    transition:border-color .15s,background .15s,box-shadow .15s;
+  }
+  .opt:hover{border-color:var(--line2);background:rgba(255,255,255,.035)}
+  .opt.sel{
+    border-color:var(--gold);
+    background:rgba(200,164,74,.07);
+    box-shadow:0 0 0 1px var(--gold-dim),0 4px 18px rgba(200,164,74,.14);
+  }
+  .opt-left{min-width:0}
+  .opt .nm{font-weight:700;font-size:13px;line-height:1.3;display:block}
+  .opt .combo-tag{
+    font-size:10px;font-weight:700;letter-spacing:.06em;
+    color:var(--gold-light);margin-left:6px;
+    border:1px solid rgba(200,164,74,.3);padding:0 5px;border-radius:4px;
+    vertical-align:middle;
+  }
+  .opt .sub{font-size:11px;color:var(--ink-dim);margin-top:2px;display:block}
+  .opt .rt{font-size:12px;color:var(--gold);font-weight:800;white-space:nowrap;flex-shrink:0}
+
+  .acc-group{margin-bottom:14px}
+  .acc-group:last-child{margin-bottom:0}
+  .acc-label{
+    font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:7px;padding-left:2px;
+  }
+
+  /* result */
+  .result-wrap{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+  .result.empty{
+    font-size:13px;color:var(--ink-dim);
+    display:flex;align-items:center;gap:10px;
+  }
+  .result.empty::before{
+    content:'';display:inline-block;width:5px;height:5px;
+    border-radius:50%;background:var(--ink-dim);flex-shrink:0;
+  }
+  .combo-card{
+    background:linear-gradient(120deg,rgba(200,164,74,.06) 0%,rgba(34,128,184,.05) 100%);
+    border:1px solid rgba(200,164,74,.25);
+    border-radius:14px;padding:16px 18px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  }
+  .combo-leg{
+    display:flex;flex-direction:column;gap:3px;
+    background:rgba(0,0,0,.25);
+    border:1px solid var(--line2);border-radius:10px;
+    padding:9px 15px;min-width:110px;
+  }
+  .combo-leg .tag{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .combo-leg .nm{font-weight:800;font-size:14px;color:var(--ink)}
+  .combo-leg.empty-leg{opacity:.35}
+  .combo-arrow{color:var(--gold-dim);font-size:18px;flex-shrink:0}
+  .combo-dist{
+    font-size:12px;color:var(--ink-soft);
+    background:rgba(0,0,0,.3);border:1px solid var(--line);
+    padding:6px 13px;border-radius:999px;white-space:nowrap;
+  }
+  .combo-dist b{color:var(--gold-light)}
+  .resetbtn{
+    margin-left:auto;border:1px solid var(--line);background:transparent;
+    color:var(--ink-dim);border-radius:999px;padding:5px 12px;
+    font-size:11px;font-weight:700;cursor:pointer;transition:.15s;
+    flex-shrink:0;
+  }
   .resetbtn:hover{border-color:var(--coral);color:var(--coral)}
+  .combo-note{margin-top:10px;font-size:12.5px;color:var(--warn);line-height:1.55}
 
-  /* CONTROLS */
-  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 6px}
-  .group{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-  .group .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
-  .chip{border:1.5px solid var(--line);background:var(--panel);color:var(--ink-soft);padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:6px}
-  .chip .dot{width:8px;height:8px;border-radius:50%}
-  .chip[data-cat="resort"] .dot{background:var(--coral)} .chip[data-cat="pension"] .dot{background:var(--moss)} .chip[data-cat="badge"] .dot{background:var(--sun)}
-  .chip:hover{border-color:var(--river)}
-  .chip.on{background:var(--river);color:#030d14;border-color:var(--river)}
+  /* ── CONTROLS ── */
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+  .filter-lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);font-weight:700}
+  .chip{
+    border:1px solid var(--line);background:transparent;
+    color:var(--ink-soft);padding:5px 14px;border-radius:999px;
+    font-size:12px;font-weight:600;cursor:pointer;transition:.15s;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:.15s}
+  .chip[data-cat="badge"] .dot{background:var(--gold)}
+  .chip[data-cat="resort"] .dot{background:var(--coral)}
+  .chip[data-cat="pension"] .dot{background:var(--moss)}
+  .chip:hover{border-color:var(--line2);color:var(--ink)}
+  .chip.on{background:rgba(255,255,255,.04);border-color:var(--line2);color:var(--ink)}
 
-  .list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-  .count{font-size:12px;color:var(--ink-soft);margin:2px 2px 0}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);padding:14px 15px;border-left:5px solid var(--line);cursor:pointer;transition:.16s;scroll-margin-top:20px}
-  .card:hover{transform:translateY(-2px)}
-  .card.active{outline:2.5px solid var(--river);outline-offset:1px}
-  .card[data-cat="resort"]{border-left-color:var(--coral)} .card[data-cat="pension"]{border-left-color:var(--moss)} .card[data-cat="badge"]{border-left-color:var(--sun)}
+  /* ── LIST ── */
+  .listcount{font-size:12px;color:var(--ink-dim);margin-bottom:14px;letter-spacing:.02em}
+  .list{display:flex;flex-direction:column;gap:10px}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--line);
+    border-radius:14px;padding:17px 19px;
+    cursor:pointer;position:relative;overflow:hidden;
+    transition:border-color .15s,box-shadow .15s,transform .15s;
+  }
+  .card::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(135deg,rgba(255,255,255,.022) 0%,transparent 60%);
+  }
+  .card:hover{
+    border-color:var(--line2);
+    transform:translateY(-1px);
+    box-shadow:0 8px 28px rgba(0,0,0,.45);
+  }
+  .card.active{
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px var(--gold-dim),0 8px 32px rgba(200,164,74,.12);
+  }
+  .card[data-cat="badge"]{border-left-color:var(--gold)}
+  .card[data-cat="resort"]{border-left-color:var(--coral)}
+  .card[data-cat="pension"]{border-left-color:var(--moss)}
   .card.hide{display:none}
-  .ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-  .cname{font-size:16px;font-weight:800;margin:0;letter-spacing:-.01em}
-  .ctag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
-  .ctag.resort{background:#2e1812;color:#f09070} .ctag.pension{background:#152a1e;color:#8ecfa0} .ctag.badge{background:#2e2410;color:#f0c060}
-  .cmeta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:7px;font-size:13px;color:var(--ink-soft);align-items:center}
-  .stars{color:var(--sun);font-weight:800}
-  .region{font-size:12px;background:#07121c;border:1px solid var(--line);padding:1px 8px;border-radius:5px}
-  .note{margin:9px 0 0;font-size:13px;color:var(--ink-soft)}
-  .flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-  .flag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#07121c;border:1px solid var(--line);color:var(--river)}
-  .flag.combo{background:#2e2410;border-color:#4a3c10;color:#f0c060}
-  .flag.lowrel{background:#2e1c10;border-color:#4a2e10;color:var(--warn)}
-  .clinks{display:flex;gap:14px;margin-top:10px;font-size:12px}
-  .clinks a{color:var(--river);text-decoration:none;font-weight:700;border-bottom:1.5px solid transparent}
-  .clinks a:hover{border-color:var(--river)}
-  .pickbtn{margin-top:11px;border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
-  .pickbtn:hover{border-color:var(--river);color:var(--river)}
-  .card.active .pickbtn{border-color:var(--river);color:var(--river)}
 
-  .disclaimer{margin-top:30px;font-size:12px;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;line-height:1.7}
+  .ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+  .cname{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+  .ctag{
+    font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;
+    letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
+  }
+  .ctag.badge{background:rgba(200,164,74,.1);color:var(--gold-light);border:1px solid rgba(200,164,74,.2)}
+  .ctag.resort{background:rgba(192,88,56,.1);color:#d88068;border:1px solid rgba(192,88,56,.2)}
+  .ctag.pension{background:rgba(78,144,96,.1);color:#70b882;border:1px solid rgba(78,144,96,.2)}
+
+  .cmeta{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:12.5px;color:var(--ink-soft);align-items:center;margin-bottom:9px}
+  .stars{color:var(--gold);font-weight:700}
+  .sep-dot{color:var(--ink-dim)}
+  .region{
+    font-size:11px;background:rgba(255,255,255,.025);
+    border:1px solid var(--line);padding:1px 8px;border-radius:4px;
+  }
+  .note{font-size:12.5px;color:var(--ink-soft);line-height:1.65;margin-bottom:10px}
+  .flags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+  .flag{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:999px}
+  .flag{background:rgba(34,128,184,.1);border:1px solid rgba(34,128,184,.2);color:var(--river-bright)}
+  .flag.combo{background:rgba(200,164,74,.1);border:1px solid rgba(200,164,74,.2);color:var(--gold-light)}
+  .flag.lowrel{background:rgba(192,120,40,.1);border:1px solid rgba(192,120,40,.2);color:var(--warn)}
+
+  .clinks{display:flex;gap:16px;font-size:12px;margin-bottom:12px}
+  .clinks a{color:var(--ink-soft);text-decoration:none;font-weight:600;transition:.15s;border-bottom:1px solid transparent}
+  .clinks a:hover{color:var(--gold);border-color:var(--gold-dim)}
+
+  .pickbtn{
+    border:1px solid var(--line);background:transparent;
+    color:var(--ink-soft);border-radius:8px;padding:6px 14px;
+    font-size:12px;font-weight:700;cursor:pointer;transition:.15s;
+  }
+  .pickbtn:hover{border-color:var(--gold);color:var(--gold)}
+  .card.active .pickbtn{
+    border-color:var(--gold);color:var(--gold);
+    background:rgba(200,164,74,.07);
+  }
+
+  hr.divider{border:none;border-top:1px solid var(--line);margin:32px 0}
+  .disclaimer{
+    font-size:12px;color:var(--ink-dim);
+    background:rgba(255,255,255,.018);
+    border:1px solid var(--line);border-radius:12px;
+    padding:15px 18px;line-height:1.85;
+  }
   .disclaimer b{color:var(--warn)}
-  .empty{padding:30px;text-align:center;color:var(--ink-soft);font-size:14px}
-  :focus-visible{outline:3px solid var(--river);outline-offset:2px}
+  .empty-msg{padding:48px;text-align:center;color:var(--ink-soft);font-size:14px}
+
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <header class="hero">
     <div class="dateline">
-      <div class="big"><b>7/16</b> – 17</div>
-      <div class="days">목–금 · 1박 2일 · 자가용</div>
+      <div class="big"><b>7/16</b><span class="sep">–</span>17</div>
+      <div class="sub">목–금 &nbsp;·&nbsp; 1박 2일 &nbsp;·&nbsp; 자가용</div>
     </div>
     <div class="meta">
       <span>📍 <b>3개 권역</b> 가평·춘천·홍천</span>
       <span>🎯 액티비티 <b>빠지</b> + 숙소 조합형</span>
-      <span>📅 <b>7월</b> 장마·폭염 변수 → 우천 대체 필요</span>
+      <span>📅 <b>7월</b> 장마·폭염 → 출발 전 기상 재확인</span>
       <span>⭐ 평점 Google 기준 · 변동 가능</span>
     </div>
   </header>
 
-  <!-- COMBINATION BUILDER -->
+  <!-- BUILDER -->
   <section class="builder">
-    <h2>내 여행 조합 만들기</h2>
-    <p class="hint">액티비티(빠지) 1곳과 숙소 1곳을 고르면 직선거리(참고용)를 알려줍니다.</p>
+    <p class="builder-title">조합 플래너</p>
+    <p class="builder-hint">빠지 1곳 + 숙소 1곳을 선택하면 직선거리(참고용)를 계산합니다.</p>
     <div class="bgrid">
       <div class="bcol">
-        <h3><i style="background:var(--sun)"></i>1. 액티비티 · 빠지</h3>
+        <div class="bcol-head">
+          <span class="step-badge">1</span>
+          <h3>액티비티 · 빠지</h3>
+        </div>
         <div class="opts" id="optBadge"></div>
       </div>
       <div class="bcol">
-        <h3><i style="background:var(--coral)"></i>2. 숙소 · 호텔/리조트/펜션</h3>
+        <div class="bcol-head">
+          <span class="step-badge">2</span>
+          <h3>숙소 선택</h3>
+        </div>
         <div id="optStay"></div>
       </div>
     </div>
-    <div class="result empty" id="result">아직 선택이 없습니다. 위에서 빠지와 숙소를 골라 보세요.</div>
+    <div class="result-wrap">
+      <div class="result empty" id="result">빠지와 숙소를 선택하면 조합 결과가 표시됩니다.</div>
+    </div>
   </section>
 
+  <!-- CONTROLS -->
   <div class="controls">
-    <div class="group">
-      <span class="lbl">목록 필터</span>
-      <span class="chip on" data-cat="badge"><span class="dot"></span>빠지</span>
-      <span class="chip on" data-cat="resort"><span class="dot"></span>호텔·리조트</span>
-      <span class="chip on" data-cat="pension"><span class="dot"></span>펜션·풀빌라</span>
-    </div>
+    <span class="filter-lbl">필터</span>
+    <span class="chip on" data-cat="badge"><span class="dot"></span>빠지</span>
+    <span class="chip on" data-cat="resort"><span class="dot"></span>호텔·리조트</span>
+    <span class="chip on" data-cat="pension"><span class="dot"></span>펜션·풀빌라</span>
   </div>
 
-  <div class="count" id="listcount"></div>
+  <div class="listcount" id="listcount"></div>
   <div class="list" id="list"></div>
-  <div class="empty" id="emptyList" style="display:none">선택한 필터에 해당하는 장소가 없습니다.</div>
+  <div class="empty-msg" id="emptyList" style="display:none">선택한 필터에 해당하는 장소가 없습니다.</div>
 
+  <hr class="divider">
   <div class="disclaimer">
     <b>데이터 신뢰도</b> — 평점·후기 수는 Google Places 기준이며 변동 가능(정확도: 중간). 후기 15건 미만은 "신뢰도 낮음"으로 표기.
-    가격·운영기간(여름 한정)·패키지 구성은 데이터에 없어 <b>예약 전 직접 확인 필수</b>(정확도: 낮음).
-    거리는 <b>직선거리</b>로 실제 도로 동선과 다릅니다. 7월은 장마·폭염 변수가 커 출발 1주 전 기상 재확인을 권장합니다.
+    가격·운영기간·패키지 구성은 <b>예약 전 직접 확인 필수</b>(정확도: 낮음).
+    거리는 <b>직선거리</b>로 실제 도로 동선과 다릅니다.
   </div>
 </div>
 
 <script>
 const PLACES=[
-  {name:"가평빠지 클럽비발디", cat:"badge", region:"가평", lat:37.7523996, lng:127.5361849, rating:4.8, rc:42, note:"워터파크형 수상레저. 시설 관리 양호, 안전교육 후기 다수.", url:"http://www.clubvivaldi.com/", tel:"010-8500-4714"},
-  {name:"가평빠지 캠프통포레스트", cat:"badge", region:"가평 서락면", lat:37.7027985, lng:127.4921624, rating:4.3, rc:28, note:"수영장·찜질방·사우나 병설. 성수기 대기 길다는 후기.", tel:"031-584-6000"},
-  {name:"가평빠지 레저친구", cat:"badge", region:"춘천 남산면", lat:37.7999422, lng:127.5305681, rating:4.8, rc:9, combo:true, note:"수상레저+게스트하우스 숙박+저녁 바비큐 1박2일 후기. 숙박+빠지 통합형으로 보임(예약 시 구성 확인 권장).", url:"http://레저친구.com/", tel:"033-263-5513"},
-  {name:"가평빠지 리버패리스", cat:"badge", region:"춘천 남산면", lat:37.7750894, lng:127.5400144, rating:4.7, rc:3, note:"웨이크보드 강습 후기. 표본 작음.", tel:"010-3835-4777"},
-  {name:"가평빠지 블랙수상레저", cat:"badge", region:"가평", lat:37.7738435, lng:127.5348004, rating:5.0, rc:3, note:"바나나보트·땅콩보트 단체 후기. 표본 작음.", tel:"010-7272-2182"},
-
-  {name:"소노펠리체 비발디파크", cat:"resort", region:"홍천", lat:37.6515689, lng:127.6830613, rating:4.5, rc:5353, note:"오션월드(워터파크) 인접. 가족형 대형 리조트. 빠지 라인과는 거리 있음 → 빠지 대체용.", url:"https://www.sonohotelsresorts.com/sn", tel:"1588-4888"},
-  {name:"세이지우드 홍천", cat:"resort", region:"홍천", lat:37.8858097, lng:128.1112618, rating:4.7, rc:482, note:"골프+수영장 고급 휴양. 권역 동쪽 끝, 빠지와 멀다.", tel:"033-439-1000"},
-  {name:"엘리시안 강촌", cat:"resort", region:"춘천", lat:37.8221226, lng:127.5898427, rating:4.1, rc:4128, note:"북한강변 리조트. 빠지 라인과 비교적 가까워 동선 유리.", url:"http://www.elysian.co.kr/", tel:"033-260-2000"},
-  {name:"상상마당 춘천 스테이", cat:"resort", region:"춘천", lat:37.8727389, lng:127.7024335, rating:4.2, rc:571, note:"호반·아트 감성, 가성비. 춘천 시내·닭갈비 접근 좋음.", tel:"033-818-4200"},
-  {name:"소노캄 비발디파크", cat:"resort", region:"홍천", lat:37.6477638, lng:127.6813547, rating:4.3, rc:287, note:"리노베이션 객실. 비발디파크 단지 내.", tel:"1588-4888"},
-
-  {name:"빌라코지 풀빌라", cat:"pension", region:"가평 청평", lat:37.7090472, lng:127.4679965, rating:4.9, rc:19, note:"온수 프라이빗풀·강뷰. 청결 후기 우수.", url:"https://www.villacozy.co.kr/", tel:"010-2935-4849"},
-  {name:"풀빌라 릴리브펜션", cat:"pension", region:"가평 상면", lat:37.7559928, lng:127.3785857, rating:4.5, rc:51, note:"깊은 수영장·바비큐. 청결 양호하나 벌레 지적 일부.", tel:"010-5784-1433"},
-  {name:"올리브 풀빌라", cat:"pension", region:"가평 청평", lat:37.767924, lng:127.4656142, rating:4.4, rc:114, note:"키즈·실내풀. 넓은 공간. 관리 편차 후기 존재.", tel:null},
-  {name:"풀빌라 팰리스", cat:"pension", region:"가평", lat:37.8158464, lng:127.461554, rating:4.2, rc:31, note:"가슴높이 온수풀. 건물 노후·습기 지적 있음.", tel:"010-3303-1000"},
-  {name:"호명산 스카이라운지 펜션", cat:"pension", region:"가평", lat:37.7494826, lng:127.5009666, rating:4.5, rc:119, note:"산 전망·카페 병설. 영어 가능 호스트(워크숍·단체 적합).", tel:"010-5500-5032"},
+  {name:"가평빠지 클럽비발디",cat:"badge",region:"가평",lat:37.7523996,lng:127.5361849,rating:4.8,rc:42,note:"워터파크형 수상레저. 시설 관리 양호, 안전교육 후기 다수.",url:"http://www.clubvivaldi.com/",tel:"010-8500-4714"},
+  {name:"가평빠지 캠프통포레스트",cat:"badge",region:"가평 서락면",lat:37.7027985,lng:127.4921624,rating:4.3,rc:28,note:"수영장·찜질방·사우나 병설. 성수기 대기 길다는 후기.",tel:"031-584-6000"},
+  {name:"가평빠지 레저친구",cat:"badge",region:"춘천 남산면",lat:37.7999422,lng:127.5305681,rating:4.8,rc:9,combo:true,note:"수상레저+게스트하우스 숙박+저녁 바비큐 1박2일 후기. 숙박+빠지 통합형(예약 시 구성 확인 권장).",url:"http://레저친구.com/",tel:"033-263-5513"},
+  {name:"가평빠지 리버패리스",cat:"badge",region:"춘천 남산면",lat:37.7750894,lng:127.5400144,rating:4.7,rc:3,note:"웨이크보드 강습 후기. 표본 작음.",tel:"010-3835-4777"},
+  {name:"가평빠지 블랙수상레저",cat:"badge",region:"가평",lat:37.7738435,lng:127.5348004,rating:5.0,rc:3,note:"바나나보트·땅콩보트 단체 후기. 표본 작음.",tel:"010-7272-2182"},
+  {name:"소노펠리체 비발디파크",cat:"resort",region:"홍천",lat:37.6515689,lng:127.6830613,rating:4.5,rc:5353,note:"오션월드(워터파크) 인접. 가족형 대형 리조트. 빠지 라인과는 거리 있음.",url:"https://www.sonohotelsresorts.com/sn",tel:"1588-4888"},
+  {name:"세이지우드 홍천",cat:"resort",region:"홍천",lat:37.8858097,lng:128.1112618,rating:4.7,rc:482,note:"골프+수영장 고급 휴양. 권역 동쪽 끝, 빠지와 멀다.",tel:"033-439-1000"},
+  {name:"엘리시안 강촌",cat:"resort",region:"춘천",lat:37.8221226,lng:127.5898427,rating:4.1,rc:4128,note:"북한강변 리조트. 빠지 라인과 비교적 가까워 동선 유리.",url:"http://www.elysian.co.kr/",tel:"033-260-2000"},
+  {name:"상상마당 춘천 스테이",cat:"resort",region:"춘천",lat:37.8727389,lng:127.7024335,rating:4.2,rc:571,note:"호반·아트 감성, 가성비. 춘천 시내·닭갈비 접근 좋음.",tel:"033-818-4200"},
+  {name:"소노캄 비발디파크",cat:"resort",region:"홍천",lat:37.6477638,lng:127.6813547,rating:4.3,rc:287,note:"리노베이션 객실. 비발디파크 단지 내.",tel:"1588-4888"},
+  {name:"빌라코지 풀빌라",cat:"pension",region:"가평 청평",lat:37.7090472,lng:127.4679965,rating:4.9,rc:19,note:"온수 프라이빗풀·강뷰. 청결 후기 우수.",url:"https://www.villacozy.co.kr/",tel:"010-2935-4849"},
+  {name:"풀빌라 릴리브펜션",cat:"pension",region:"가평 상면",lat:37.7559928,lng:127.3785857,rating:4.5,rc:51,note:"깊은 수영장·바비큐. 청결 양호하나 벌레 지적 일부.",tel:"010-5784-1433"},
+  {name:"올리브 풀빌라",cat:"pension",region:"가평 청평",lat:37.767924,lng:127.4656142,rating:4.4,rc:114,note:"키즈·실내풀. 넓은 공간. 관리 편차 후기 존재.",tel:null},
+  {name:"풀빌라 팰리스",cat:"pension",region:"가평",lat:37.8158464,lng:127.461554,rating:4.2,rc:31,note:"가슴높이 온수풀. 건물 노후·습기 지적 있음.",tel:"010-3303-1000"},
+  {name:"호명산 스카이라운지 펜션",cat:"pension",region:"가평",lat:37.7494826,lng:127.5009666,rating:4.5,rc:119,note:"산 전망·카페 병설. 영어 가능 호스트(워크숍·단체 적합).",tel:"010-5500-5032"},
 ];
 
 function haversine(a,b){const R=6371,t=Math.PI/180,dLat=(b.lat-a.lat)*t,dLng=(b.lng-a.lng)*t,la1=a.lat*t,la2=b.lat*t;const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));}
@@ -201,24 +355,23 @@ const listEl=document.getElementById("list");
 const state={cats:new Set(["badge","resort","pension"]),pickBadge:null,pickStay:null};
 
 function buildOptions(){
-  const badge=document.getElementById("optBadge");
+  const badgeWrap=document.getElementById("optBadge");
   PLACES.filter(p=>p.cat==="badge").forEach(p=>{
     const idx=PLACES.indexOf(p);
     const o=document.createElement("div");o.className="opt";o.dataset.idx=idx;
-    o.innerHTML=`<span class="nm">${p.name.replace(/^가평빠지 /,'')}${p.combo?' · 통합형':''}<span class="sub">${p.region}</span></span><span class="rt">★${p.rating.toFixed(1)}</span>`;
+    o.innerHTML=`<div class="opt-left"><span class="nm">${p.name.replace(/^가평빠지 /,'')}${p.combo?'<span class="combo-tag">통합형</span>':''}</span><span class="sub">${p.region}</span></div><span class="rt">★ ${p.rating.toFixed(1)}</span>`;
     o.addEventListener("click",()=>{state.pickBadge=(state.pickBadge===idx?null:idx);refresh();});
-    badge.appendChild(o);
+    badgeWrap.appendChild(o);
   });
   const stayWrap=document.getElementById("optStay");
-  const groups=[["resort","호텔·리조트","var(--coral)"],["pension","펜션·풀빌라","var(--moss)"]];
-  groups.forEach(([cat,label,col])=>{
+  [["resort","호텔·리조트"],["pension","펜션·풀빌라"]].forEach(([cat,label])=>{
     const g=document.createElement("div");g.className="acc-group";
-    g.innerHTML=`<p class="gl"><i style="background:${col}"></i>${label}</p>`;
+    g.innerHTML=`<div class="acc-label">${label}</div>`;
     const opts=document.createElement("div");opts.className="opts";
     PLACES.filter(p=>p.cat===cat).forEach(p=>{
       const idx=PLACES.indexOf(p);
       const o=document.createElement("div");o.className="opt";o.dataset.idx=idx;
-      o.innerHTML=`<span class="nm">${p.name}<span class="sub">${p.region}</span></span><span class="rt" style="color:${col}">★${p.rating.toFixed(1)}</span>`;
+      o.innerHTML=`<div class="opt-left"><span class="nm">${p.name}</span><span class="sub">${p.region}</span></div><span class="rt" style="color:var(--ink-soft)">★ ${p.rating.toFixed(1)}</span>`;
       o.addEventListener("click",()=>{state.pickStay=(state.pickStay===idx?null:idx);refresh();});
       opts.appendChild(o);
     });
@@ -231,20 +384,20 @@ function refresh(){
   document.querySelectorAll("#optStay .opt").forEach(o=>o.classList.toggle("sel",+o.dataset.idx===state.pickStay));
   const res=document.getElementById("result");
   if(state.pickBadge===null&&state.pickStay===null){
-    res.className="result empty";res.textContent="아직 선택이 없습니다. 위에서 빠지와 숙소를 골라 보세요.";
+    res.className="result empty";res.textContent="빠지와 숙소를 선택하면 조합 결과가 표시됩니다.";
   }else{
     res.className="result";
     const b=state.pickBadge!==null?PLACES[state.pickBadge]:null;
     const s=state.pickStay!==null?PLACES[state.pickStay]:null;
     let dist="";
-    if(b&&s){const km=haversine(b,s);dist=`<span class="dist">직선거리 <b>약 ${km.toFixed(1)}km</b> · 참고용</span>`;}
-    res.innerHTML=`<div class="combo-card">
-      ${b?`<span class="leg"><span class="tag" style="color:var(--sun)">빠지</span><span class="nm">${b.name.replace(/^가평빠지 /,'')}</span></span>`:`<span class="leg" style="opacity:.5"><span class="tag">빠지</span><span class="nm">미선택</span></span>`}
-      <span class="arrow">↔</span>
-      ${s?`<span class="leg"><span class="tag" style="color:${s.cat==='resort'?'var(--coral)':'var(--moss)'}">숙소</span><span class="nm">${s.name}</span></span>`:`<span class="leg" style="opacity:.5"><span class="tag">숙소</span><span class="nm">미선택</span></span>`}
-      ${dist}
-      <button class="resetbtn" id="reset">초기화</button>
-    </div>${b&&s&&b.combo?`<p class="note" style="margin-top:10px">⚠ ${b.name}는 숙박+빠지 통합형으로 보입니다 — 별도 숙소 없이 이곳 1곳으로 1박2일 구성이 가능할 수 있습니다(예약 시 확인).</p>`:''}`;
+    if(b&&s){const km=haversine(b,s);dist=`<span class="combo-dist">직선거리 <b>약 ${km.toFixed(1)}km</b></span>`;}
+    const bLeg=b
+      ?`<div class="combo-leg"><span class="tag">빠지</span><span class="nm">${b.name.replace(/^가평빠지 /,'')}</span></div>`
+      :`<div class="combo-leg empty-leg"><span class="tag">빠지</span><span class="nm">미선택</span></div>`;
+    const sLeg=s
+      ?`<div class="combo-leg"><span class="tag">숙소</span><span class="nm">${s.name}</span></div>`
+      :`<div class="combo-leg empty-leg"><span class="tag">숙소</span><span class="nm">미선택</span></div>`;
+    res.innerHTML=`<div class="combo-card">${bLeg}<span class="combo-arrow">→</span>${sLeg}${dist}<button class="resetbtn" id="reset">초기화</button></div>${b&&b.combo?`<p class="combo-note">⚠ ${b.name}는 숙박+빠지 통합형으로 보입니다 — 별도 숙소 없이 1박2일 구성 가능할 수 있습니다(예약 시 확인).</p>`:''}`;
     document.getElementById("reset").addEventListener("click",()=>{state.pickBadge=null;state.pickStay=null;refresh();});
   }
   updatePickedCards();
@@ -258,18 +411,25 @@ function render(){
     const low=p.rc<15;
     const card=document.createElement("div");
     card.className="card"+(show?"":" hide");card.dataset.cat=p.cat;card.dataset.idx=idx;card.id="card-"+idx;
-    card.innerHTML=`<div class="ctop"><p class="cname">${p.name}</p><span class="ctag ${p.cat}">${tagName}</span></div>
-      <div class="cmeta"><span class="stars">★ ${p.rating.toFixed(1)}</span><span>후기 ${p.rc}건</span><span class="region">${p.region}</span></div>
+    card.innerHTML=`
+      <div class="ctop"><p class="cname">${p.name}</p><span class="ctag ${p.cat}">${tagName}</span></div>
+      <div class="cmeta"><span class="stars">★ ${p.rating.toFixed(1)}</span><span class="sep-dot">·</span><span>후기 ${p.rc}건</span><span class="region">${p.region}</span></div>
       <p class="note">${p.note}</p>
-      <div class="flags">${p.combo?'<span class="flag combo">숙박+빠지 통합형(추정)</span>':''}${low?'<span class="flag lowrel">신뢰도 낮음·표본 작음</span>':''}</div>
+      <div class="flags">${p.combo?'<span class="flag combo">통합형(추정)</span>':''}${low?'<span class="flag lowrel">표본 작음</span>':''}</div>
       <div class="clinks">${p.url?`<a href="${p.url}" target="_blank" rel="noopener">웹사이트 ↗</a>`:''}${p.tel?`<a href="tel:${p.tel.replace(/[^0-9+]/g,'')}">${p.tel}</a>`:''}</div>
-      <button class="pickbtn" data-pick="${idx}">${p.cat==="badge"?"빠지로 선택":"숙소로 선택"}</button>`;
-    card.querySelector(".pickbtn").addEventListener("click",e=>{e.stopPropagation();if(p.cat==="badge")state.pickBadge=(state.pickBadge===idx?null:idx);else state.pickStay=(state.pickStay===idx?null:idx);refresh();});
+      <button class="pickbtn">${p.cat==="badge"?"빠지로 선택":"숙소로 선택"}</button>`;
+    card.querySelector(".pickbtn").addEventListener("click",e=>{
+      e.stopPropagation();
+      if(p.cat==="badge")state.pickBadge=(state.pickBadge===idx?null:idx);
+      else state.pickStay=(state.pickStay===idx?null:idx);
+      refresh();
+    });
     listEl.appendChild(card);
     if(show)shown++;
   });
   document.getElementById("listcount").textContent=`${shown}곳 표시 중`;
   document.getElementById("emptyList").style.display=shown?"none":"block";
+  updatePickedCards();
 }
 
 function updatePickedCards(){
@@ -280,7 +440,12 @@ function updatePickedCards(){
 }
 
 document.querySelectorAll(".chip").forEach(chip=>{
-  chip.addEventListener("click",()=>{const c=chip.dataset.cat;if(state.cats.has(c)){state.cats.delete(c);chip.classList.remove("on");}else{state.cats.add(c);chip.classList.add("on");}render();refresh();});
+  chip.addEventListener("click",()=>{
+    const c=chip.dataset.cat;
+    if(state.cats.has(c)){state.cats.delete(c);chip.classList.remove("on");}
+    else{state.cats.add(c);chip.classList.add("on");}
+    render();refresh();
+  });
 });
 
 buildOptions();render();refresh();

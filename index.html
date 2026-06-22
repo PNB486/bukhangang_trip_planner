@@ -227,6 +227,52 @@
 
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* ── MOBILE BACK BTN ── */
+  .mobile-back{display:none;align-items:center;gap:8px;padding:13px 16px;font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;border-bottom:1px solid var(--line);background:rgba(8,12,16,.96);position:sticky;top:0;z-index:10}
+  .mobile-back:hover{color:var(--gold-light)}
+  .mobile-back svg{flex-shrink:0}
+
+  /* ── MOBILE ── */
+  @media(max-width:767px){
+    body{overflow:auto}
+
+    .topbar{padding:0 10px;min-height:48px;gap:6px;flex-wrap:nowrap}
+    .brand{padding:8px 0;font-size:13px;gap:5px}
+    .brand-sub{display:none}
+    .flow{border-left:none;margin-left:0;padding-left:0;gap:4px}
+    .flow>div:not(.flow-step),.flow-arrow{display:none}
+    .flow-step{padding:5px 10px;font-size:11px;border:1px solid var(--line2);border-radius:7px}
+    .flow-step[data-tab="badge"].active{border-color:var(--gold);background:rgba(200,164,74,.12)}
+    .flow-step[data-tab="food"].active{border-color:var(--teal);background:rgba(26,144,128,.12)}
+    .flow-step[data-tab="badge"].active::after,.flow-step[data-tab="food"].active::after{display:none}
+    .flow-step .fs-time{display:none}
+    .tb-btn-label{display:none}
+    .tb-btn{padding:6px 10px}
+
+    .layout{display:flex;flex-direction:column;grid-template-columns:unset;height:auto!important;flex:unset;min-height:0}
+    .list-panel{border-right:none;overflow:visible;flex:unset;min-height:0}
+    .list-scroll{overflow-y:visible;flex:unset;max-height:none}
+
+    .detail-panel{
+      position:fixed;inset:0;z-index:300;
+      transform:translateX(110%);
+      transition:transform .25s cubic-bezier(.4,0,.2,1);
+      overflow-y:auto;background:var(--bg);
+    }
+    .detail-panel.mobile-open{transform:translateX(0)}
+    .mobile-back{display:flex}
+
+    .detail-content{padding:16px 16px 80px;max-width:none}
+    .info-grid{grid-template-columns:1fr}
+    .vote-section{flex-direction:column;align-items:flex-start;gap:10px}
+    .d-top{flex-wrap:wrap}
+
+    .modal-overlay{align-items:flex-end;padding:0}
+    .modal{border-radius:16px 16px 0 0;max-width:none;padding:20px 20px 32px}
+
+    .sugg-panel{max-width:none}
+  }
 </style>
 </head>
 <body>
@@ -255,7 +301,7 @@
     </div>
   </div>
   <div class="topbar-actions">
-    <button class="tb-btn teal" id="btnShowSugg">💡 제안 목록 <span class="sugg-cnt" id="suggCnt"></span></button>
+    <button class="tb-btn teal" id="btnShowSugg">💡 <span class="tb-btn-label">제안 목록 </span><span class="sugg-cnt" id="suggCnt"></span></button>
   </div>
 </div>
 
@@ -268,6 +314,7 @@
     <div class="list-scroll" id="listScroll"></div>
   </div>
   <div class="detail-panel" id="detailPanel">
+    <div class="mobile-back" id="mobileBack"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 목록으로</div>
     <div class="detail-empty" id="detailEmpty">
       <div class="icon">☜</div>
       <p>왼쪽에서 장소를 선택하면<br>상세 정보와 투표가 표시됩니다.</p>
@@ -547,7 +594,10 @@ function appendItem(wrap, p, num, isFood) {
       ${p.rating ? `<div class="item-star${isFood?' teal':''}">★ ${p.rating.toFixed(1)}</div>` : ''}
       <div class="item-votes${vc>0?' has-votes':''}" data-pid="${pid}">${vc>0?'👍 '+vc:''}</div>
     </div>`;
-  el.addEventListener('click', () => { state.selectedIdx = idx; renderList(); renderDetail(p, isFood); });
+  el.addEventListener('click', () => {
+    state.selectedIdx = idx; renderList(); renderDetail(p, isFood);
+    if (window.innerWidth < 768) document.getElementById('detailPanel').classList.add('mobile-open');
+  });
   wrap.appendChild(el);
 }
 
@@ -657,10 +707,18 @@ document.querySelectorAll('.flow-step[data-tab]').forEach(t => {
 
 /* ── INIT ── */
 function fixHeight() {
-  const tbar = document.querySelector('.topbar').offsetHeight;
-  document.getElementById('layout').style.height = (window.innerHeight - tbar) + 'px';
+  if (window.innerWidth >= 768) {
+    const tbar = document.querySelector('.topbar').offsetHeight;
+    document.getElementById('layout').style.height = (window.innerHeight - tbar) + 'px';
+  } else {
+    document.getElementById('layout').style.height = '';
+  }
 }
 window.addEventListener('resize', fixHeight); fixHeight();
+
+document.getElementById('mobileBack').addEventListener('click', () => {
+  document.getElementById('detailPanel').classList.remove('mobile-open');
+});
 
 subscribeVotes();
 subscribeSuggestions();
